@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -m http.server 8000 --bind 127.0.0.1)",
+      "Bash(curl -s -o /dev/null -w \"verify.html: %{http_code}\\\\n\" http://127.0.0.1:8000/verify.html)",
+      "Bash(curl -s -o /dev/null -w \"careerhub_v1.html: %{http_code}\\\\n\" http://127.0.0.1:8000/careerhub_v1.html)",
+      "Bash(curl -s -o /dev/null -w \"sw.js: %{http_code}\\\\n\" http://127.0.0.1:8000/sw.js)",
+      "Bash(curl -s -o /dev/null -w \"manifest.webmanifest: %{http_code}\\\\n\" http://127.0.0.1:8000/manifest.webmanifest)",
+      "Bash(curl -s -o /dev/null -w \"crawler.yml: %{http_code}\\\\n\" http://127.0.0.1:8000/careerhub-v1-bundle/.github/workflows/crawler.yml)",
+      "Bash(curl -s -o /dev/null -w \"verify.html:               %{http_code}\\\\n\" http://127.0.0.1:8000/verify.html)",
+      "Bash(curl -s -o /dev/null -w \"index.html \\(跳转\\):          %{http_code}\\\\n\" http://127.0.0.1:8000/index.html)",
+      "Bash(curl -s -o /dev/null -w \"careerhub_v1.html:         %{http_code}\\\\n\" http://127.0.0.1:8000/careerhub_v1.html)",
+      "Bash(curl -s -o /dev/null -w \"deploy.yml:                %{http_code}\\\\n\" http://127.0.0.1:8000/.github/workflows/deploy.yml)",
+      "Bash(curl -s -o /dev/null -w \"crawler.yml \\(新路径\\):      %{http_code}\\\\n\" http://127.0.0.1:8000/.github/workflows/crawler.yml)"
+    ]
+  }
+}

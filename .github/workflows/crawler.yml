@@ -1,0 +1,134 @@
+name: 公司库爬虫定时任务
+
+# ============================================================
+# 何时跑：
+#   - 每天 UTC 02:00 (北京时间 10:00)
+#   - 手动触发：Actions tab → Run workflow
+#   - PR / push 到 crawler/ 目录时也跑一次（用于调试）
+# 输出：
+#   - data/opportunities.json （仓库内）
+#   - 一旦内容变化，自动 commit 回 main 分支
+#   - 前端可通过 jsDelivr CDN 直接消费：
+#     https://cdn.jsdelivr.net/gh/<owner>/<repo>@main/careerhub-v1-bundle/data/opportunities.json
+# ============================================================
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      push_cloudbase:
+        description: '同时推送到 CloudBase（需先配 secrets）'
+        type: boolean
+        default: false
+  push:
+    branches: [main]
+    paths:
+      - 'careerhub-v1-bundle/crawler/**'
+      - '.github/workflows/crawler.yml'
+
+# 让两次同时触发时后者覆盖前者，避免并发 commit 冲突
+concurrency:
+  group: crawler
+  cancel-in-progress: true
+
+permissions:
+  contents: write  # 允许 push commit
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: 'careerhub-v1-bundle/crawler/requirements.txt'
+
+      - name: Install deps
+        working-directory: careerhub-v1-bundle/crawler
+        run: pip install -r requirements.txt
+
+      - name: Run scraper
+        working-directory: careerhub-v1-bundle/crawler
+        env:
+          TCB_SECRET_ID:  ${{ secrets.TCB_SECRET_ID }}
+          TCB_SECRET_KEY: ${{ secrets.TCB_SECRET_KEY }}
+          TCB_ENV_ID:     ${{ secrets.TCB_ENV_ID }}
+          PUSH_CLOUDBASE: ${{ github.event.inputs.push_cloudbase || 'false' }}
+        run: |
+          set -e
+          python scraper.py
+          # scraper 默认写 opportunities.json 到 cwd（crawler/），搬到 ../data/
+          mkdir -p ../data
+          if [ -f opportunities.json ]; then
+            mv opportunities.json ../data/opportunities.json
+          fi
+          ls -lh ../data/
+
+      - name: Generate index meta
+        working-directory: careerhub-v1-bundle
+        run: |
+          python - <<'PY'
+          import json, os, datetime
+          path = 'data/opportunities.json'
+          if not os.path.exists(path):
+              print('no opportunities.json, skip meta')
+              raise SystemExit(0)
+          with open(path, encoding='utf-8') as f:
+              items = json.load(f)
+          meta = {
+              'updatedAt': datetime.datetime.utcnow().isoformat() + 'Z',
+              'count': len(items),
+              'activeCount': sum(1 for i in items if i.get('deadline')),
+              'sources': sorted({i.get('source','') for i in items if i.get('source')}),
+          }
+          with open('data/opportunities.meta.json', 'w', encoding='utf-8') as f:
+              json.dump(meta, f, ensure_ascii=False, indent=2)
+          print('meta:', meta)
+          PY
+
+      - name: Commit if changed
+        run: |
+          set -e
+          git config user.name  "careerhub-bot"
+          git config user.email "actions@github.com"
+          git add careerhub-v1-bundle/data/
+          if git diff --cached --quiet; then
+            echo "[skip] no data changes"
+            exit 0
+          fi
+          DATE=$(date -u +'%Y-%m-%d %H:%M UTC')
+          git commit -m "chore(crawler): update opportunities snapshot ${DATE}" \
+                     -m "Automated by .github/workflows/crawler.yml"
+          # 重试推送，避免与并行 commit 冲突
+          for i in 1 2 3; do
+            if git push; then
+              echo "[push] ok"
+              exit 0
+            fi
+            echo "[push] retry $i"
+            git pull --rebase --autostash || true
+            sleep 3
+          done
+          echo "::error::push failed after 3 retries"
+          exit 1
+
+      - name: Summary
+        if: always()
+        run: |
+          if [ -f careerhub-v1-bundle/data/opportunities.json ]; then
+            COUNT=$(python -c "import json; print(len(json.load(open('careerhub-v1-bundle/data/opportunities.json'))))")
+            echo "### 🕷️ 爬虫运行报告" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "- 拉取条数：**${COUNT}**" >> $GITHUB_STEP_SUMMARY
+            echo "- 时间：$(date -u +'%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
+            echo "- 输出：\`careerhub-v1-bundle/data/opportunities.json\`" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "前端消费 URL：" >> $GITHUB_STEP_SUMMARY
+            echo "\`https://cdn.jsdelivr.net/gh/${GITHUB_REPOSITORY}@main/careerhub-v1-bundle/data/opportunities.json\`" >> $GITHUB_STEP_SUMMARY
+          fi

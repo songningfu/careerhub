@@ -1,0 +1,3 @@
+requests>=2.31,<3
+# 可选：推送到 CloudBase 时再装
+# tencentcloud-sdk-python>=3.0.1000

@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>CareerHub · 功能体检台</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root {
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --text: #0f172a;
+    --text-light: #64748b;
+    --text-lighter: #94a3b8;
+    --border: #e2e8f0;
+    --primary: #6366f1;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #0ea5e9;
+    --shadow: 0 4px 14px rgba(99,102,241,0.08);
+    --shadow-lg: 0 16px 48px rgba(99,102,241,0.15);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 50%, #fce7f3 100%);
+    color: var(--text);
+    padding: 32px 20px;
+    line-height: 1.6;
+  }
+  .container { max-width: 920px; margin: 0 auto; }
+  header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  h1 { font-size: 32px; margin: 0 0 8px; letter-spacing: -0.5px;
+       background: linear-gradient(135deg, #6366f1, #ec4899);
+       -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .subtitle { color: var(--text-light); font-size: 14px; }
+
+  .summary {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px; margin-bottom: 28px;
+  }
+  .sum-card {
+    background: var(--card); border-radius: 14px; padding: 16px 18px;
+    box-shadow: var(--shadow); border: 1px solid var(--border);
+    text-align: center;
+  }
+  .sum-num { font-size: 28px; font-weight: 800; line-height: 1; }
+  .sum-num.pass { color: var(--success); }
+  .sum-num.fail { color: var(--danger); }
+  .sum-num.warn { color: var(--warning); }
+  .sum-num.run  { color: var(--info); }
+  .sum-label { font-size: 11px; color: var(--text-lighter); margin-top: 6px;
+               text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+
+  .check-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 22px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+    transition: all 0.25s;
+  }
+  .check-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-1px); }
+  .check-head {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 8px;
+  }
+  .check-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+    background: rgba(99,102,241,0.1);
+  }
+  .check-title { font-weight: 700; font-size: 15px; flex: 1; }
+  .check-status {
+    font-size: 11px; padding: 4px 10px; border-radius: 10px;
+    font-weight: 700; letter-spacing: 0.5px;
+    background: var(--border); color: var(--text-light);
+  }
+  .check-status.pass { background: rgba(16,185,129,0.12); color: var(--success); }
+  .check-status.fail { background: rgba(239,68,68,0.12); color: var(--danger); }
+  .check-status.warn { background: rgba(245,158,11,0.14); color: var(--warning); }
+  .check-status.run  { background: rgba(14,165,233,0.14); color: var(--info); }
+  .check-desc { font-size: 13px; color: var(--text-light); margin-left: 48px; }
+  .check-result {
+    margin-left: 48px; margin-top: 10px;
+    font-size: 13px;
+    border-left: 3px solid var(--border);
+    padding: 8px 12px;
+    background: var(--bg);
+    border-radius: 0 8px 8px 0;
+    display: none;
+  }
+  .check-result.show { display: block; }
+  .check-result.pass { border-left-color: var(--success); background: rgba(16,185,129,0.04); }
+  .check-result.fail { border-left-color: var(--danger);  background: rgba(239,68,68,0.04); color: #b91c1c; }
+  .check-result.warn { border-left-color: var(--warning); background: rgba(245,158,11,0.04); color: #b45309; }
+  .check-actions { margin-left: 48px; margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .btn {
+    padding: 7px 14px; border: none; border-radius: 8px;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(99,102,241,0.25);
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(99,102,241,0.35); }
+  .btn-ghost {
+    background: rgba(99,102,241,0.08);
+    color: var(--primary);
+  }
+  .btn-ghost:hover { background: rgba(99,102,241,0.15); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  input[type="text"], input[type="file"] {
+    padding: 7px 10px; border: 1px solid var(--border); border-radius: 8px;
+    font-size: 12px; font-family: inherit;
+    background: var(--card);
+  }
+  input[type="text"] { font-family: monospace; min-width: 220px; }
+  details { margin-left: 48px; margin-top: 8px; font-size: 12px; color: var(--text-light); }
+  details summary { cursor: pointer; user-select: none; }
+  pre {
+    background: #0f172a; color: #e2e8f0; padding: 12px; border-radius: 8px;
+    overflow-x: auto; font-size: 11px; line-height: 1.5;
+    max-height: 200px; overflow-y: auto;
+  }
+
+  .run-all {
+    text-align: center; margin: 0 0 28px;
+  }
+  .run-all .btn-primary {
+    padding: 12px 28px; font-size: 14px;
+  }
+
+  .open-main {
+    background: linear-gradient(135deg, #ec4899, #f59e0b);
+    color: #fff; padding: 12px 20px; border-radius: 12px;
+    text-decoration: none; font-weight: 700;
+    display: inline-flex; align-items: center; gap: 8px;
+    box-shadow: 0 8px 20px rgba(236,72,153,0.3);
+    transition: all 0.2s;
+  }
+  .open-main:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(236,72,153,0.4); }
+  .nav-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 32px;
+  }
+  .back-link {
+    color: var(--text-light); text-decoration: none; font-size: 14px;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .back-link:hover { color: var(--primary); }
+
+  .meta-bar {
+    background: var(--card); border-radius: 10px;
+    padding: 10px 14px; font-size: 11px; color: var(--text-lighter);
+    margin-bottom: 18px; display: flex; gap: 18px; flex-wrap: wrap;
+    border: 1px dashed var(--border);
+  }
+  .meta-bar code { background: var(--bg); padding: 2px 6px; border-radius: 4px; color: var(--text); }
+  kbd {
+    background: #fff; border: 1px solid var(--border); border-bottom-width: 2px;
+    padding: 1px 6px; border-radius: 4px; font-size: 11px; font-family: monospace;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="nav-bar">
+    <a class="back-link" href="./careerhub_v1.html">← 主程序</a>
+    <a class="open-main" href="./careerhub_v1.html" target="_blank">
+      🚀 在新标签页打开主程序
+    </a>
+  </div>
+
+  <header>
+    <h1>🩺 CareerHub 功能体检台</h1>
+    <div class="subtitle">逐项检查 V1.5 新功能 · 点「全部体检」一键跑完</div>
+  </header>
+
+  <div class="meta-bar">
+    <span>URL: <code id="meta-url"></code></span>
+    <span>协议: <code id="meta-proto"></code></span>
+    <span>主程序: <code>careerhub_v1.html</code></span>
+    <span>测试时间: <code id="meta-time"></code></span>
+  </div>
+
+  <div class="summary">
+    <div class="sum-card"><div class="sum-num pass" id="sum-pass">0</div><div class="sum-label">✓ 通过</div></div>
+    <div class="sum-card"><div class="sum-num warn" id="sum-warn">0</div><div class="sum-label">⚠ 警告</div></div>
+    <div class="sum-card"><div class="sum-num fail" id="sum-fail">0</div><div class="sum-label">✗ 失败</div></div>
+    <div class="sum-card"><div class="sum-num run"  id="sum-todo">0</div><div class="sum-label">待手动</div></div>
+  </div>
+
+  <div class="run-all">
+    <button class="btn btn-primary" onclick="runAllAuto()">▶ 全部体检（自动项）</button>
+  </div>
+
+  <!-- 检查 1：本地 HTTP 服务器 -->
+  <div class="check-card" data-check="proto">
+    <div class="check-head">
+      <div class="check-icon">🌐</div>
+      <div class="check-title">运行环境</div>
+      <span class="check-status" id="st-proto">待检</span>
+    </div>
+    <div class="check-desc">必须 http / https 才能跑 PWA、Service Worker、PDF 解析</div>
+    <div class="check-result" id="rs-proto"></div>
+    <div class="check-actions">
+      <button class="btn btn-ghost" onclick="checkProtocol()">↻ 检查</button>
+    </div>
+  </div>
+
+  <!-- 检查 2：manifest.webmanifest -->
+  <div class="check-card" data-check="manifest">
+    <div class="check-head">
+      <div class="check-icon">📋</div>
+      <div class="check-title">PWA Manifest 文件</div>
+      <span class="check-status" id="st-manifest">待检</span>
+    </div>
+    <div class="check-desc">manifest.webmanifest 能不能被浏览器加载</div>
+    <div class="check-result" id="rs-manifest"></div>
+    <div class="check-actions">
+      <button class="btn btn-ghost" onclick="checkManifest()">↻ 检查</button>
+      <a href="./manifest.webmanifest" target="_blank" class="btn btn-ghost">📄 直接打开 manifest</a>
+    </div>
+  </div>
+
+  <!-- 检查 3：Service Worker -->
+  <div class="check-card" data-check="sw">
+    <div class="check-head">
+      <div class="check-icon">⚙️</div>
+      <div class="check-title">Service Worker 注册</div>
+      <span class="check-status" id="st-sw">待检</span>
+    </div>
+    <div class="check-desc">注册 sw.js，让离线缓存 / 启动加速生效</div>
+    <div class="check-result" id="rs-sw"></div>
+    <div class="check-actions">
+      <button class="btn btn-ghost" onclick="checkServiceWorker()">↻ 注册并检查</button>
+      <button class="btn btn-ghost" onclick="unregisterSW()">🗑 注销</button>
+    </div>
+  </div>
+
+  <!-- 检查 4：PDF.js 加载 -->
+  <div class="check-card" data-check="pdfjs">
+    <div class="check-head">
+      <div class="check-icon">📕</div>
+      <div class="check-title">PDF.js 库可用性</div>
+      <span class="check-status" id="st-pdfjs">待检</span>
+    </div>
+    <div class="check-desc">从 CDN 加载 PDF.js（首次约 800KB）</div>
+    <div class="check-result" id="rs-pdfjs"></div>
+    <div class="check-actions">
+      <button class="btn btn-ghost" onclick="checkPDFJS()">↻ 加载</button>
+    </div>
+  </div>
+
+  <!-- 检查 5：PDF 技能提取（真测） -->
+  <div class="check-card" data-check="skills">
+    <div class="check-head">
+      <div class="check-icon">🏷️</div>
+      <div class="check-title">简历 PDF 技能提取</div>
+      <span class="check-status" id="st-skills">待手动</span>
+    </div>
+    <div class="check-desc">上传你的简历 PDF，看能提取出多少个技能标签</div>
+    <div class="check-result" id="rs-skills"></div>
+    <div class="check-actions">
+      <input type="file" id="pdfFile" accept=".pdf" onchange="testPDFExtract(event)">
+    </div>
+  </div>
+
+  <!-- 检查 6：Server酱推送 -->
+  <div class="check-card" data-check="sct">
+    <div class="check-head">
+      <div class="check-icon">📲</div>
+      <div class="check-title">Server酱微信推送</div>
+      <span class="check-status" id="st-sct">待手动</span>
+    </div>
+    <div class="check-desc">填入 SCKEY，点测试，看微信收不收得到</div>
+    <div class="check-result" id="rs-sct"></div>
+    <div class="check-actions">
+      <input type="text" id="sckey" placeholder="SCT..." value="">
+      <button class="btn btn-primary" onclick="testServerChan()">📤 发测试消息</button>
+      <a class="btn btn-ghost" href="https://sct.ftqq.com" target="_blank">🔑 没 SCKEY？去申请</a>
+    </div>
+  </div>
+
+  <!-- 检查 7：PWA 安装条件 -->
+  <div class="check-card" data-check="pwa-install">
+    <div class="check-head">
+      <div class="check-icon">📱</div>
+      <div class="check-title">PWA 安装条件</div>
+      <span class="check-status" id="st-pwa-install">待检</span>
+    </div>
+    <div class="check-desc">检查浏览器是否会触发"添加到主屏幕"</div>
+    <div class="check-result" id="rs-pwa-install"></div>
+    <div class="check-actions">
+      <button class="btn btn-ghost" onclick="checkPWAInstall()">↻ 检查条件</button>
+    </div>
+  </div>
+
+  <!-- 检查 8：登录页特效（视觉检查） -->
+  <div class="check-card" data-check="auth-fx">
+    <div class="check-head">
+      <div class="check-icon">✨</div>
+      <div class="check-title">登录页鼠标特效</div>
+      <span class="check-status" id="st-auth-fx">待手动</span>
+    </div>
+    <div class="check-desc">需要打开主程序的登录页眼看：极光跟手 / 卡片倾斜 / 彗星轨迹 / 粒子飘 / Logo 光环</div>
+    <div class="check-result" id="rs-auth-fx"></div>
+    <div class="check-actions">
+      <a class="btn btn-primary" href="./careerhub_v1.html" target="_blank">👀 打开主程序看效果</a>
+      <button class="btn btn-ghost" onclick="markManual('auth-fx', 'pass', '我已亲眼看到所有特效')">✅ 我看到了，标记通过</button>
+      <button class="btn btn-ghost" onclick="markManual('auth-fx', 'fail', '我没看到特效')">❌ 没看到</button>
+    </div>
+  </div>
+
+  <!-- 检查 9：deadline 推送链路 -->
+  <div class="check-card" data-check="reminder">
+    <div class="check-head">
+      <div class="check-icon">⏰</div>
+      <div class="check-title">Deadline 自动推送链路</div>
+      <span class="check-status" id="st-reminder">待手动</span>
+    </div>
+    <div class="check-desc">需要进主程序：在求职台或意向岗位添加一条 24h 内截止的记录 → 刷新页面 → 看微信</div>
+    <div class="check-result" id="rs-reminder"></div>
+    <div class="check-actions">
+      <button class="btn btn-ghost" onclick="clearPushedHistory()">🧹 清空已推记录（方便重测）</button>
+      <button class="btn btn-ghost" onclick="markManual('reminder', 'pass', '微信收到自动提醒了')">✅ 收到了</button>
+    </div>
+  </div>
+
+  <!-- 检查 10：爬虫 workflow 静态校验 -->
+  <div class="check-card" data-check="crawler-yml">
+    <div class="check-head">
+      <div class="check-icon">🕷️</div>
+      <div class="check-title">爬虫 workflow YAML</div>
+      <span class="check-status" id="st-crawler-yml">待检</span>
+    </div>
+    <div class="check-desc">检查 .github/workflows/crawler.yml 能否取回（即文件存在）</div>
+    <div class="check-result" id="rs-crawler-yml"></div>
+    <div class="check-actions">
+      <button class="btn btn-ghost" onclick="checkCrawlerYML()">↻ 检查</button>
+      <a class="btn btn-ghost" href="./.github/workflows/crawler.yml" target="_blank">📄 直接打开</a>
+    </div>
+  </div>
+
+  <div style="margin-top:40px;text-align:center;color:var(--text-lighter);font-size:11px">
+    <details style="display:inline-block;text-align:left">
+      <summary>📖 快捷键 / 使用说明</summary>
+      <ul style="margin-top:8px;line-height:1.8">
+        <li><kbd>R</kbd> 重跑所有自动项</li>
+        <li><kbd>M</kbd> 跳到主程序</li>
+        <li>所有 ✅/❌ 标记不持久化，刷新清空</li>
+        <li>看不懂 / 想跳过某项，留着「待手动」也行</li>
+      </ul>
+    </details>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   工具
+============================================================ */
+function $(id) { return document.getElementById(id); }
+function setStatus(name, type, label) {
+  const el = $(`st-${name}`);
+  el.className = 'check-status ' + type;
+  el.textContent = label;
+  updateSummary();
+}
+function setResult(name, type, html) {
+  const el = $(`rs-${name}`);
+  el.className = 'check-result show ' + type;
+  el.innerHTML = html;
+}
+function updateSummary() {
+  const all = document.querySelectorAll('.check-status');
+  let pass=0, warn=0, fail=0, todo=0;
+  all.forEach(el => {
+    if (el.classList.contains('pass')) pass++;
+    else if (el.classList.contains('fail')) fail++;
+    else if (el.classList.contains('warn')) warn++;
+    else todo++;
+  });
+  $('sum-pass').textContent = pass;
+  $('sum-warn').textContent = warn;
+  $('sum-fail').textContent = fail;
+  $('sum-todo').textContent = todo;
+}
+function markManual(name, type, msg) {
+  const labels = { pass: '✓ 通过', fail: '✗ 失败', warn: '⚠ 警告' };
+  setStatus(name, type, labels[type]);
+  setResult(name, type, msg);
+}
+
+/* ============================================================
+   元信息
+============================================================ */
+$('meta-url').textContent = location.href;
+$('meta-proto').textContent = location.protocol;
+$('meta-time').textContent = new Date().toLocaleString('zh-CN');
+
+/* ============================================================
+   1. 运行环境
+============================================================ */
+function checkProtocol() {
+  const proto = location.protocol;
+  if (proto === 'file:') {
+    setStatus('proto', 'fail', '✗ 失败');
+    setResult('proto', 'fail',
+      `当前是 <code>file://</code> 直接打开。<br>必须用 HTTP 服务器！项目目录下跑：<br><pre>python3 -m http.server 8000</pre>然后访问 <code>http://localhost:8000/verify.html</code>`);
+  } else if (proto === 'http:' && !['localhost','127.0.0.1'].includes(location.hostname)) {
+    setStatus('proto', 'warn', '⚠ 警告');
+    setResult('proto', 'warn',
+      `当前是 HTTP 远程访问 (<code>${location.hostname}</code>)，Service Worker 不会注册。请用 HTTPS 或 localhost。`);
+  } else {
+    setStatus('proto', 'pass', '✓ 通过');
+    setResult('proto', 'pass',
+      `OK · <code>${proto}//${location.host}</code> 满足 PWA / SW / fetch 所有要求`);
+  }
+}
+
+/* ============================================================
+   2. Manifest
+============================================================ */
+async function checkManifest() {
+  setStatus('manifest', 'run', '检查中...');
+  try {
+    const res = await fetch('./manifest.webmanifest');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    const ok = data.name && data.icons && data.icons.length && data.start_url;
+    if (ok) {
+      setStatus('manifest', 'pass', '✓ 通过');
+      setResult('manifest', 'pass',
+        `OK · 名称：<b>${data.name}</b> · 图标：${data.icons.length} 个 · start_url：<code>${data.start_url}</code>`);
+    } else {
+      setStatus('manifest', 'warn', '⚠ 警告');
+      setResult('manifest', 'warn', 'manifest 字段不完整：' + Object.keys(data).join(', '));
+    }
+  } catch (e) {
+    setStatus('manifest', 'fail', '✗ 失败');
+    setResult('manifest', 'fail',
+      `加载 manifest.webmanifest 失败：${e.message}<br>请确认文件和 verify.html 在同目录下。`);
+  }
+}
+
+/* ============================================================
+   3. Service Worker
+============================================================ */
+async function checkServiceWorker() {
+  setStatus('sw', 'run', '注册中...');
+  if (!('serviceWorker' in navigator)) {
+    setStatus('sw', 'fail', '✗ 失败');
+    setResult('sw', 'fail', '当前浏览器不支持 Service Worker API');
+    return;
+  }
+  if (location.protocol === 'file:') {
+    setStatus('sw', 'fail', '✗ 失败');
+    setResult('sw', 'fail', 'file:// 协议下浏览器禁止注册 Service Worker');
+    return;
+  }
+  try {
+    const reg = await navigator.serviceWorker.register('./sw.js', { scope: './' });
+    // 等待 active
+    await new Promise(res => {
+      if (reg.active) return res();
+      const w = reg.installing || reg.waiting;
+      if (!w) return res();
+      w.addEventListener('statechange', () => {
+        if (w.state === 'activated') res();
+      });
+      setTimeout(res, 3000);
+    });
+    const state = reg.active?.state || reg.installing?.state || 'unknown';
+    setStatus('sw', 'pass', '✓ 通过');
+    setResult('sw', 'pass',
+      `已注册 · scope：<code>${reg.scope}</code> · 状态：<b>${state}</b><br>下次刷新会被 SW 拦截，可在 DevTools → Application → Service Workers 看活动情况`);
+  } catch (e) {
+    setStatus('sw', 'fail', '✗ 失败');
+    setResult('sw', 'fail', `注册失败：${e.message}<br>常见原因：sw.js 不存在，或非 https/localhost`);
+  }
+}
+async function unregisterSW() {
+  if (!('serviceWorker' in navigator)) return;
+  const regs = await navigator.serviceWorker.getRegistrations();
+  for (const r of regs) await r.unregister();
+  setStatus('sw', 'warn', '已注销');
+  setResult('sw', 'warn', `已注销 ${regs.length} 个 SW`);
+}
+
+/* ============================================================
+   4. PDF.js
+============================================================ */
+let _pdfjsPromise = null;
+function loadPDFJS() {
+  if (_pdfjsPromise) return _pdfjsPromise;
+  if (window.pdfjsLib) {
+    return Promise.resolve(window.pdfjsLib);
+  }
+  _pdfjsPromise = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js';
+    s.onload = () => {
+      pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.worker.min.js';
+      resolve(window.pdfjsLib);
+    };
+    s.onerror = () => reject(new Error('CDN 加载失败'));
+    document.head.appendChild(s);
+  });
+  return _pdfjsPromise;
+}
+async function checkPDFJS() {
+  setStatus('pdfjs', 'run', '加载中...');
+  try {
+    const t0 = performance.now();
+    await loadPDFJS();
+    const t = (performance.now() - t0).toFixed(0);
+    setStatus('pdfjs', 'pass', '✓ 通过');
+    setResult('pdfjs', 'pass',
+      `PDF.js v${pdfjsLib.version} 加载完成 · 耗时 ${t}ms · worker URL：<code style="font-size:11px">${pdfjsLib.GlobalWorkerOptions.workerSrc}</code>`);
+  } catch (e) {
+    setStatus('pdfjs', 'fail', '✗ 失败');
+    setResult('pdfjs', 'fail', `加载失败：${e.message}<br>排查：CDN 被墙？换 unpkg.com？`);
+  }
+}
+
+/* ============================================================
+   5. 简历技能提取（与主程序同一份逻辑）
+============================================================ */
+const SKILL_DICT = [
+  'Java','Python','JavaScript','TypeScript','Go','Golang','C++','C#','C','Rust','Swift','Kotlin','PHP','Ruby','Scala','R','MATLAB','Objective-C','Dart','Lua',
+  'React','Vue','Vue.js','Vue3','Angular','Next.js','Nuxt','Svelte','Webpack','Vite','Rollup','HTML','CSS','Sass','Less','Tailwind','Tailwind CSS','Bootstrap','Ant Design','Element UI','Element Plus','Redux','MobX','Vuex','Pinia','React Native','Flutter','Electron','Uniapp','Three.js','D3.js','ECharts','WebGL','PWA','SSR','SSG',
+  'Spring','Spring Boot','Spring Cloud','MyBatis','Hibernate','Django','Flask','FastAPI','Express','Koa','NestJS','Egg.js','Gin','Beego','Echo','Laravel','Rails','ASP.NET','.NET Core','GraphQL','gRPC','RESTful','RESTful API','WebSocket','Netty','Tomcat','Nginx',
+  'MySQL','PostgreSQL','SQLite','SQL Server','Oracle','MongoDB','Redis','Memcached','Elasticsearch','ClickHouse','HBase','Cassandra','Neo4j','DynamoDB','TiDB','MariaDB','InfluxDB',
+  'Hadoop','Spark','Flink','Hive','HDFS','Kafka','RabbitMQ','RocketMQ','Pulsar','Airflow','Presto','Dremio','Snowflake','DBT','Storm','ZooKeeper','Kibana','Logstash','Splunk',
+  'Docker','Kubernetes','K8s','Helm','Istio','Jenkins','GitLab CI','GitHub Actions','CircleCI','Travis','Ansible','Terraform','Prometheus','Grafana','ELK','Loki','Sentry','AWS','Azure','GCP','阿里云','腾讯云','华为云','CDN','Serverless','CloudBase','Vercel','Netlify','Cloudflare',
+  'TensorFlow','PyTorch','Keras','Scikit-learn','sklearn','XGBoost','LightGBM','Pandas','NumPy','Matplotlib','Seaborn','OpenCV','HuggingFace','LangChain','LlamaIndex','Stable Diffusion','BERT','GPT','Transformer','CNN','RNN','LSTM','GAN','RAG','LLM','大模型','机器学习','深度学习','强化学习','计算机视觉','自然语言处理','NLP','CV','推荐系统','数据挖掘','SLAM','OCR',
+  'Android','iOS','Jetpack','Compose','SwiftUI','UIKit','MVVM','MVP','MVI','HarmonyOS','鸿蒙',
+  'Git','SVN','Linux','Shell','Bash','Vim','VSCode','IntelliJ','Eclipse','Postman','JIRA','Confluence','Figma','Sketch','Photoshop','Illustrator','Premiere','After Effects','XMind','Notion','飞书','钉钉','企业微信',
+  'JUnit','TestNG','Jest','Mocha','Cypress','Selenium','Appium','Playwright','Pytest','PostMan','Charles','Fiddler',
+  'Scrum','敏捷开发','PRD','MRD','BRD','OKR','KPI','A/B Test','SEO','SEM','增长黑客','用户画像','RFM','转化漏斗','用户旅程','竞品分析','需求分析','SaaS','PaaS','IaaS','SOLID','DDD','TDD','BDD','CI/CD','微服务','分布式','高并发','高可用','容器化','负载均衡','消息队列','缓存设计','索引优化','SQL 优化',
+  'LeetCode','ACM','ICPC','数据结构','算法','动态规划','贪心','回溯','二叉树','图论','字符串',
+  '英语','日语','韩语','德语','法语','西班牙语','CET-6','CET-4','雅思','托福','TOEFL','IELTS','GRE','GMAT',
+];
+function matchSkills(text) {
+  const found = new Map();
+  const t = ' ' + text.toLowerCase().replace(/[　\s]+/g, ' ') + ' ';
+  for (const key of SKILL_DICT) {
+    const lower = key.toLowerCase();
+    if (/[一-龥]/.test(key) || /[.#+]/.test(key)) {
+      if (t.includes(lower) && !found.has(lower)) found.set(lower, key);
+    } else {
+      const escaped = lower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const pattern = new RegExp(`(^|[^a-z0-9])${escaped}([^a-z0-9]|$)`, 'i');
+      if (pattern.test(t) && !found.has(lower)) found.set(lower, key);
+    }
+  }
+  return Array.from(found.values()).slice(0, 30);
+}
+
+async function testPDFExtract(ev) {
+  const file = ev.target.files[0];
+  if (!file) return;
+  setStatus('skills', 'run', '解析中...');
+  setResult('skills', 'warn', `正在解析 <b>${file.name}</b> (${(file.size/1024).toFixed(0)}KB)...`);
+  try {
+    await loadPDFJS();
+    const buf = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+    let allText = '';
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const tc = await page.getTextContent();
+      allText += tc.items.map(it => it.str).join(' ') + '\n';
+    }
+    const skills = matchSkills(allText);
+    const preview = allText.slice(0, 200).replace(/\s+/g, ' ');
+
+    if (skills.length === 0) {
+      setStatus('skills', 'warn', '⚠ 无匹配');
+      setResult('skills', 'warn',
+        `${pdf.numPages} 页 · 提取了 ${allText.length} 字符但词典里没匹配到。<details><summary>查看文本预览</summary><pre>${preview}...</pre></details>`);
+    } else {
+      setStatus('skills', 'pass', `✓ 识别 ${skills.length} 项`);
+      const chips = skills.map(s => `<span style="display:inline-block;padding:3px 10px;background:rgba(99,102,241,0.12);color:#6366f1;border-radius:999px;font-size:12px;font-weight:600;margin:2px">${s}</span>`).join('');
+      setResult('skills', 'pass',
+        `${pdf.numPages} 页 · ${allText.length} 字符 · 提取到 <b>${skills.length}</b> 个技能：<div style="margin-top:6px">${chips}</div>`);
+    }
+  } catch (e) {
+    setStatus('skills', 'fail', '✗ 失败');
+    setResult('skills', 'fail', `解析失败：${e.message}`);
+  }
+}
+
+/* ============================================================
+   6. Server酱
+============================================================ */
+async function testServerChan() {
+  const key = $('sckey').value.trim();
+  if (!key) {
+    setStatus('sct', 'warn', '⚠ 未填');
+    setResult('sct', 'warn', '请先在输入框填入 SCKEY，再点测试');
+    return;
+  }
+  if (!/^SCT\w+/.test(key)) {
+    setStatus('sct', 'fail', '✗ 格式');
+    setResult('sct', 'fail', 'SCKEY 必须以 <code>SCT</code> 开头，你填的是：<code>' + key.slice(0,8) + '...</code>');
+    return;
+  }
+  setStatus('sct', 'run', '推送中...');
+  setResult('sct', 'warn', `正在调用 sctapi.ftqq.com...`);
+  try {
+    const url = `https://sctapi.ftqq.com/${encodeURIComponent(key)}.send`;
+    const form = new URLSearchParams();
+    form.set('title', 'CareerHub · 体检台测试');
+    form.set('desp', `## 推送链路畅通 ✅\n\n来自 **CareerHub 体检台**。\n\n- 时间：${new Date().toLocaleString('zh-CN')}\n- 来源：${location.href}`);
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: form.toString(),
+    });
+    const data = await res.json();
+    if (data.code === 0) {
+      setStatus('sct', 'pass', '✓ 已推送');
+      setResult('sct', 'pass', `✅ 推送成功，请打开微信查收。<br>返回数据：<code>${JSON.stringify(data).slice(0,200)}</code>`);
+      // 保存到 localStorage，方便用户去主程序设置页继续用
+      localStorage.setItem('sckey', key);
+    } else {
+      setStatus('sct', 'fail', '✗ 失败');
+      setResult('sct', 'fail', `失败：${data.message || data.errmsg || JSON.stringify(data)}`);
+    }
+  } catch (e) {
+    setStatus('sct', 'fail', '✗ 失败');
+    setResult('sct', 'fail', `调用失败：${e.message}<br>可能原因：1) CORS 被拦 2) SCKEY 失效 3) 网络问题`);
+  }
+}
+
+/* ============================================================
+   7. PWA 安装条件
+============================================================ */
+function checkPWAInstall() {
+  const checks = [];
+  // 协议
+  if (location.protocol === 'https:' || ['localhost','127.0.0.1'].includes(location.hostname)) {
+    checks.push('✅ HTTPS 或 localhost');
+  } else {
+    checks.push('❌ 当前协议是 ' + location.protocol);
+  }
+  // standalone 已经装机
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if (isStandalone) {
+    checks.push('🎉 已安装到主屏幕（standalone 模式运行中）');
+  } else {
+    checks.push('☑️ 当前在浏览器 tab 中（未装机）');
+  }
+  // 浏览器
+  const ua = navigator.userAgent;
+  const isIOS = /iPad|iPhone|iPod/.test(ua);
+  const isAndroid = /Android/.test(ua);
+  if (isIOS) {
+    checks.push('🍎 iOS Safari：通过分享菜单 → 添加到主屏幕（没有 beforeinstallprompt）');
+  } else if (isAndroid) {
+    checks.push('🤖 Android：满足条件时浏览器会自动弹安装条');
+  } else {
+    checks.push('🖥️ 桌面浏览器：满足条件时地址栏右侧会出"安装"图标');
+  }
+  // manifest
+  const manifestLink = document.querySelector('link[rel="manifest"]');
+  checks.push(manifestLink ? `✅ manifest 已声明（${manifestLink.href}）` : '❌ 没有 manifest 链接');
+
+  setStatus('pwa-install', isStandalone ? 'pass' : 'warn', isStandalone ? '✓ 已装机' : '⚠ 条件检查');
+  setResult('pwa-install', isStandalone ? 'pass' : 'warn',
+    `<ul style="margin:0;padding-left:18px;line-height:1.8">${checks.map(c => `<li>${c}</li>`).join('')}</ul>` +
+    `<div style="margin-top:8px;font-size:11px;color:var(--text-lighter)">💡 装机检验请打开主程序，进入 App 60s 后会弹横幅</div>`);
+}
+
+/* ============================================================
+   8. clearPushedHistory
+============================================================ */
+function clearPushedHistory() {
+  const before = JSON.parse(localStorage.getItem('pushed_reminders_v1') || '{}');
+  const count = Object.keys(before).length;
+  localStorage.removeItem('pushed_reminders_v1');
+  setStatus('reminder', 'warn', '已清空');
+  setResult('reminder', 'warn', `已清空 ${count} 条历史推送记录。现在进入主程序，所有 deadline 24h 内的条目会重新推一遍。`);
+}
+
+/* ============================================================
+   9. 爬虫 workflow
+============================================================ */
+async function checkCrawlerYML() {
+  setStatus('crawler-yml', 'run', '检查中...');
+  try {
+    const res = await fetch('./.github/workflows/crawler.yml');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const text = await res.text();
+    const checks = {
+      'on.schedule': /on:[\s\S]*?schedule:/.test(text),
+      'workflow_dispatch': /workflow_dispatch:/.test(text),
+      'permissions.contents.write': /permissions:[\s\S]*?contents:\s*write/.test(text),
+      'cron 02:00 UTC': /cron:\s*'0 2 \* \* \*'/.test(text),
+      'python 3.11': /python-version:\s*'3.11'/.test(text),
+      'scraper.py': /python scraper\.py/.test(text),
+    };
+    const passed = Object.entries(checks).filter(([_, ok]) => ok);
+    const failed = Object.entries(checks).filter(([_, ok]) => !ok);
+    if (failed.length === 0) {
+      setStatus('crawler-yml', 'pass', '✓ 通过');
+      setResult('crawler-yml', 'pass',
+        `${text.split('\n').length} 行 · 关键配置全部命中：<br>${passed.map(([k]) => '<code style="font-size:11px;margin:2px">' + k + '</code>').join(' ')}`);
+    } else {
+      setStatus('crawler-yml', 'warn', '⚠ 部分缺失');
+      setResult('crawler-yml', 'warn',
+        `通过 ${passed.length}/${Object.keys(checks).length}，缺失：${failed.map(([k]) => k).join(', ')}`);
+    }
+  } catch (e) {
+    setStatus('crawler-yml', 'fail', '✗ 失败');
+    setResult('crawler-yml', 'fail',
+      `读不到 crawler.yml：${e.message}<br>路径预期：<code>./.github/workflows/crawler.yml</code>`);
+  }
+}
+
+/* ============================================================
+   全部跑（仅自动项）
+============================================================ */
+async function runAllAuto() {
+  checkProtocol();
+  await checkManifest();
+  await checkServiceWorker();
+  await checkPDFJS();
+  checkPWAInstall();
+  await checkCrawlerYML();
+}
+
+/* ============================================================
+   快捷键
+============================================================ */
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.key === 'r' || e.key === 'R') runAllAuto();
+  if (e.key === 'm' || e.key === 'M') window.location.href = './careerhub_v1.html';
+});
+
+/* ============================================================
+   自动跑一次
+============================================================ */
+window.addEventListener('load', () => {
+  setTimeout(runAllAuto, 200);
+});
+</script>
+</body>
+</html>

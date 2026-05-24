@@ -1,0 +1,11 @@
+{
+  "name": "careerhub-api",
+  "version": "0.1.0",
+  "description": "CareerHub - JD 智能解析后端",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  }
+}

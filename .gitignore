@@ -1,0 +1,34 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# 编辑器
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# CloudBase / 部署
+.cloudbase/
+.tcbrc
+.tcb-temp
+dist/
+
+# 本地实验
+*.local.html
+TEMP_*
+DRAFT_*
+
+# 日志
+*.log

@@ -1,0 +1,31 @@
+{
+  "name": "CareerHub · 求职管家",
+  "short_name": "CareerHub",
+  "description": "秋招 / 春招 / 实习一站式求职管理",
+  "start_url": "./careerhub_v1.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f8fafc",
+  "theme_color": "#6366f1",
+  "lang": "zh-CN",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM2MzY2ZjEiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNlYzQ4OTkiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExMCIgZmlsbD0idXJsKCNnKSIvPjxwYXRoIGQ9Ik0xMTUgMzcwIEwyMDAgMjkwIEwyNTcgMzM2IEwzODUgMTY4IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjM4IiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48Y2lyY2xlIGN4PSIzODUiIGN5PSIxNjgiIHI9IjM2IiBmaWxsPSJ3aGl0ZSIvPjwvc3ZnPg==",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM2MzY2ZjEiLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiNlYzQ4OTkiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cmVjdCB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgcng9IjExMCIgZmlsbD0idXJsKCNnKSIvPjxwYXRoIGQ9Ik0xMTUgMzcwIEwyMDAgMjkwIEwyNTcgMzM2IEwzODUgMTY4IiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjM4IiBmaWxsPSJub25lIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48Y2lyY2xlIGN4PSIzODUiIGN5PSIxNjgiIHI9IjM2IiBmaWxsPSJ3aGl0ZSIvPjwvc3ZnPg==",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    { "name": "今日", "short_name": "今日", "url": "./careerhub_v1.html#dashboard" },
+    { "name": "求职台", "short_name": "求职台", "url": "./careerhub_v1.html#pipeline" },
+    { "name": "公司库", "short_name": "公司库", "url": "./careerhub_v1.html#opportunities" }
+  ]
+}

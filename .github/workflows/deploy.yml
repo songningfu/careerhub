@@ -1,0 +1,103 @@
+name: 部署到 CloudBase 静态托管
+
+# ============================================================
+# 触发条件：
+#   - push 到 main 分支（线上自动更新）
+#   - 手动触发（Actions tab → Run workflow）
+# 工作流：
+#   1. 把要上线的静态文件汇集到 dist/
+#   2. 用 @cloudbase/cli 调 tcb hosting:deploy 推上去
+#   3. CloudBase 自动 CDN 刷新
+# ============================================================
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+      - 'careerhub-v1-bundle/crawler/**'
+      - 'careerhub-v1-bundle/api-backend/**'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: 构建并上传到 CloudBase Hosting
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 装 Node 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: 安装 CloudBase CLI
+        run: npm install -g @cloudbase/cli@latest
+
+      - name: 准备 dist 目录（只把网站资源拷过去）
+        run: |
+          mkdir -p dist
+          # 主程序 + PWA 资源
+          cp careerhub_v1.html  dist/
+          cp index.html         dist/
+          cp sw.js              dist/
+          cp manifest.webmanifest dist/
+          # 体检台（可选 · 想线上也能跑就保留）
+          cp verify.html        dist/ 2>/dev/null || true
+          # 爬虫产物（如果有）
+          if [ -d careerhub-v1-bundle/data ]; then
+            mkdir -p dist/data
+            cp -r careerhub-v1-bundle/data/* dist/data/ 2>/dev/null || true
+          fi
+          echo "=== dist/ 内容 ==="
+          ls -la dist/
+
+      - name: 校验必要 secrets
+        run: |
+          if [ -z "${{ secrets.TCB_SECRET_ID }}" ]; then
+            echo "::error::缺少 secret: TCB_SECRET_ID"; exit 1
+          fi
+          if [ -z "${{ secrets.TCB_SECRET_KEY }}" ]; then
+            echo "::error::缺少 secret: TCB_SECRET_KEY"; exit 1
+          fi
+          if [ -z "${{ secrets.TCB_ENV_ID }}" ]; then
+            echo "::error::缺少 secret: TCB_ENV_ID"; exit 1
+          fi
+          echo "✓ 三个 secrets 都在"
+
+      - name: 登录 CloudBase
+        env:
+          TCB_SECRET_ID:  ${{ secrets.TCB_SECRET_ID }}
+          TCB_SECRET_KEY: ${{ secrets.TCB_SECRET_KEY }}
+        run: |
+          tcb login --apiKeyId "$TCB_SECRET_ID" --apiKey "$TCB_SECRET_KEY"
+
+      - name: 部署到静态托管
+        env:
+          TCB_ENV_ID: ${{ secrets.TCB_ENV_ID }}
+        run: |
+          # 把整个 dist/ 目录推到 hosting 的根路径
+          tcb hosting deploy dist / -e "$TCB_ENV_ID"
+
+      - name: 输出部署结果
+        env:
+          TCB_ENV_ID: ${{ secrets.TCB_ENV_ID }}
+        run: |
+          echo "### 🚀 已部署到 CloudBase" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- 环境：\`$TCB_ENV_ID\`" >> $GITHUB_STEP_SUMMARY
+          echo "- 时间：$(date -u +'%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "- 提交：${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**访问地址：**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "默认域名：https://$TCB_ENV_ID.tcloudbaseapp.com/" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "> CDN 刷新需要 1-3 分钟。如果看到老版本，按 Ctrl+Shift+R 强刷。" >> $GITHUB_STEP_SUMMARY
