@@ -18,7 +18,10 @@
 
 <!-- 核心库 -->
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@cloudbase/js-sdk@1.7.29/dist/cloudbase.full.js"></script>
+<!-- CloudBase SDK：官方推荐 CDN（2.x 系列，匿名登录要求 SDK ≥ 2.0）
+     来源：https://docs.cloudbase.net/api-reference/webv2/initialization -->
+<script src="https://static.cloudbase.net/cloudbase-js-sdk/2.9.6/cloudbase.full.js"></script>
+<script>window.cloudbase || document.write('<script src="https://imgcache.qq.com/qcloud/cloudbase-js-sdk/1.4.0/cloudbase.full.js"><\/script>');</script>
 
 <!-- 增强库 -->
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
@@ -2594,16 +2597,6 @@ html.dark .auth-overlay {
   <div class="loading-text" id="loadingText">正在连接云端...</div>
 </div>
 
-    <div class="setup-step"><div class="setup-step-num">2</div><div class="setup-step-content"><div class="title">开启邮箱登录</div><div class="desc">控制台 → 身份认证 → 登录方式 → 启用「邮箱登录」</div></div></div>
-    <div class="setup-step"><div class="setup-step-num">3</div><div class="setup-step-content"><div class="title">创建数据库集合</div><div class="desc">控制台 → 数据库，依次创建：<code>applications</code> <code>interviews</code> <code>jobs</code> <code>companies</code> <code>resumes</code> <code>skills</code> <code>leetcode</code> <code>journal</code> <code>events</code> <code>speeches</code> <code>settings</code></div></div></div>
-    <div class="setup-step"><div class="setup-step-num">4</div><div class="setup-step-content"><div class="title">设置安全规则</div><div class="desc">每个集合 → 安全规则 → <code>{"read":"auth.openid==doc._openid","write":"auth.openid==doc._openid"}</code></div></div></div>
-    <div class="form-group" style="margin-top:20px"><label>云开发环境 ID</label><input id="setupEnvId" placeholder="如：careerhub-5g8xxxxxe3c"></div>
-    <div class="auth-msg error" id="setupError"></div>
-    <button class="btn btn-primary" onclick="confirmSetup()"><svg class="ic"><use href="#i-cloud"/></svg>使用云端模式</button>
-    <div class="auth-switch" style="margin-top:14px"><a onclick="enterLocalMode()">💾 跳过，先用本地模式</a></div>
-  </div>
-</div>
-
 <div class="auth-overlay" id="authOverlay" style="display:none" data-parallax="on">
   <div class="auth-bg-decoration">
     <div class="auth-blob auth-blob-1"></div>
@@ -2930,7 +2923,7 @@ const MODE_KEY = 'careerhub_mode';
 // CloudBase 配置 - 部署时改这里！
 // 在腾讯云控制台 console.cloud.tencent.com/tcb 创建环境后填入环境 ID
 // ============================================================
-const CLOUDBASE_ENV_ID = window.CLOUDBASE_ENV_ID || 'careerhub-YOUR-ENV-ID';
+const CLOUDBASE_ENV_ID = window.CLOUDBASE_ENV_ID || 'jesu-6gwqz60k00cb92a2';
 const THEME_KEY = 'careerhub_theme';
 const ONBOARD_KEY = 'careerhub_onboarded';
 let ENV_ID = localStorage.getItem(ENV_KEY) || '';

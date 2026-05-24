@@ -11,7 +11,17 @@
       "Bash(curl -s -o /dev/null -w \"index.html \\(跳转\\):          %{http_code}\\\\n\" http://127.0.0.1:8000/index.html)",
       "Bash(curl -s -o /dev/null -w \"careerhub_v1.html:         %{http_code}\\\\n\" http://127.0.0.1:8000/careerhub_v1.html)",
       "Bash(curl -s -o /dev/null -w \"deploy.yml:                %{http_code}\\\\n\" http://127.0.0.1:8000/.github/workflows/deploy.yml)",
-      "Bash(curl -s -o /dev/null -w \"crawler.yml \\(新路径\\):      %{http_code}\\\\n\" http://127.0.0.1:8000/.github/workflows/crawler.yml)"
+      "Bash(curl -s -o /dev/null -w \"crawler.yml \\(新路径\\):      %{http_code}\\\\n\" http://127.0.0.1:8000/.github/workflows/crawler.yml)",
+      "WebFetch(domain:registry.npmjs.org)",
+      "WebFetch(domain:unpkg.com)",
+      "Bash(curl -s https://imgcache.qq.com/qcloud/cloudbase-js-sdk/1.4.0/cloudbase.full.js)",
+      "Bash(curl -sI https://imgcache.qq.com/qcloud/cloudbase-js-sdk/1.4.0/cloudbase.full.js)",
+      "Bash(curl -sI -o /dev/null -w \"esm.sh/@cloudbase/js-sdk@3.3.10 → %{http_code}\\\\n\" \"https://esm.sh/@cloudbase/js-sdk@3.3.10\")",
+      "Bash(curl -sL \"https://esm.sh/@cloudbase/js-sdk@3.3.10\")",
+      "WebFetch(domain:docs.cloudbase.net)",
+      "Bash(md5 -q /Users/jasur/Desktop/求职平台助手/sw.js /Users/jasur/Desktop/求职平台助手/careerhub-v1-bundle/sw.js)",
+      "Bash(md5 -q /Users/jasur/Desktop/求职平台助手/manifest.webmanifest /Users/jasur/Desktop/求职平台助手/careerhub-v1-bundle/manifest.webmanifest)",
+      "Bash(md5 -q /Users/jasur/Desktop/求职平台助手/careerhub_v1.html /Users/jasur/Desktop/求职平台助手/careerhub-v1-bundle/careerhub_v1.html)"
     ]
   }
 }
