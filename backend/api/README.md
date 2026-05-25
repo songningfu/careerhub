@@ -1,4 +1,4 @@
-# CareerHub API Backend
+# Offerly API Backend
 
 让 `careerhub_v0.html` 的「粘贴 JD 智能解析」从 60% 准确率（本地正则）升级到 95%+（接 LLM）。
 

@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>CareerHub · 功能体检台</title>
+<title>Offerly · 功能体检台</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
   :root {
@@ -184,8 +184,8 @@
   </div>
 
   <header>
-    <h1>🩺 CareerHub 功能体检台</h1>
-    <div class="subtitle">逐项检查 V1.5 新功能 · 点「全部体检」一键跑完</div>
+    <h1>🩺 Offerly 功能体检台</h1>
+    <div class="subtitle">逐项检查所有功能模块 · 点「全部体检」一键跑完</div>
   </header>
 
   <div class="meta-bar">
@@ -624,8 +624,8 @@ async function testServerChan() {
   try {
     const url = `https://sctapi.ftqq.com/${encodeURIComponent(key)}.send`;
     const form = new URLSearchParams();
-    form.set('title', 'CareerHub · 体检台测试');
-    form.set('desp', `## 推送链路畅通 ✅\n\n来自 **CareerHub 体检台**。\n\n- 时间：${new Date().toLocaleString('zh-CN')}\n- 来源：${location.href}`);
+    form.set('title', 'Offerly · 体检台测试');
+    form.set('desp', `## 推送链路畅通 ✅\n\n来自 **Offerly 体检台**。\n\n- 时间：${new Date().toLocaleString('zh-CN')}\n- 来源：${location.href}`);
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },

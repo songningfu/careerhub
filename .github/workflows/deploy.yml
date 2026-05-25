@@ -15,8 +15,8 @@ on:
     paths-ignore:
       - '**.md'
       - '.gitignore'
-      - 'careerhub-v1-bundle/crawler/**'
-      - 'careerhub-v1-bundle/api-backend/**'
+      - 'backend/crawler/**'
+      - 'backend/api/**'
   workflow_dispatch:
 
 concurrency:
@@ -52,9 +52,9 @@ jobs:
           # 体检台（可选 · 想线上也能跑就保留）
           cp verify.html        dist/ 2>/dev/null || true
           # 爬虫产物（如果有）
-          if [ -d careerhub-v1-bundle/data ]; then
+          if [ -d backend/data ]; then
             mkdir -p dist/data
-            cp -r careerhub-v1-bundle/data/* dist/data/ 2>/dev/null || true
+            cp -r backend/data/* dist/data/ 2>/dev/null || true
           fi
           echo "=== dist/ 内容 ==="
           ls -la dist/

@@ -1,4 +1,4 @@
-# CareerHub 项目架构总览
+# Offerly 项目架构总览
 
 理解整个系统数据走向 · 不到 5 分钟看完。
 
@@ -23,14 +23,14 @@
 │     └─ README.md
 │
 ├─ 🛠️ 后端代码（这些不部署到 CloudBase）
-│  └─ careerhub-v1-bundle/
+│  └─ backend/
 │     ├─ crawler/                    ← Python 爬虫源码
 │     │  ├─ scraper.py               ← 抓 GitHub 招聘合集
 │     │  └─ requirements.txt
 │     ├─ data/                       ← 爬虫产出的 opportunities.json
-│     ├─ api-backend/vercel/         ← LLM API（将来部署到 Vercel）
+│     ├─ api/         ← LLM API（将来部署到 Vercel）
 │     │  └─ api/parse-jd.js          ← JD 智能解析
-│     └─ api-backend/docs/DEPLOY.md
+│     └─ api/docs/DEPLOY.md
 │
 └─ 📖 文档
    ├─ DEPLOY_GITHUB.md               ← GitHub 自动部署手册

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-CareerHub 公司库爬虫脚手架
+Offerly 公司库爬虫脚手架
 - 抓 GitHub 上的招聘信息聚合 repo（无反爬、合规、信息最新）
 - 输出标准化 JSON 推送到 CloudBase opportunities 集合
 
@@ -187,7 +187,7 @@ def push_to_cloudbase(items):
 
 def main():
     print("=" * 60)
-    print(f"CareerHub 公司库爬虫 · {datetime.now().isoformat()}")
+    print(f"Offerly 公司库爬虫 · {datetime.now().isoformat()}")
     print("=" * 60)
 
     # 1. 拉取

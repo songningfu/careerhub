@@ -232,9 +232,9 @@ A：仓库 Settings → Actions → General → Workflow permissions 要勾 ✅ 
 │   └── README.md
 ├── DEPLOY_GITHUB.md                  ← 你现在看的这份
 ├── CLOUDBASE_DEPLOY.md               ← 原版手动部署文档
-└── careerhub-v1-bundle/
+└── backend/
     ├── crawler/                      ← 爬虫源码
-    ├── api-backend/                  ← LLM API（部署到 Vercel）
+    ├── api/                  ← LLM API（部署到 Vercel）
     └── data/                         ← 爬虫产物（自动更新）
 ```
 

@@ -38,7 +38,7 @@ crontab -e
 新建 `.github/workflows/crawler.yml`：
 
 ```yaml
-name: CareerHub Crawler
+name: Offerly Crawler
 on:
   schedule:
     - cron: '0 19 * * *'  # 每天 UTC 19:00 = 北京时间凌晨 3:00

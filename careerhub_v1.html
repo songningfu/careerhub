@@ -2,14 +2,14 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>CareerHub · 求职助理</title>
+<title>Offerly · 求职管理平台</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
 <!-- PWA：主题色 + iOS 适配 -->
 <meta name="theme-color" content="#6366f1">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="CareerHub">
+<meta name="apple-mobile-web-app-title" content="Offerly">
 <meta name="mobile-web-app-capable" content="yes">
 
 <!-- 内联 SVG 图标（PWA icon + favicon） -->
@@ -2601,7 +2601,7 @@ html.dark .auth-overlay {
     <symbol id="i-edit" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></symbol>
     <symbol id="i-map-pin" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
     <symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
-    <!-- CareerHub 自定义品牌标志：上升轨迹 + 目标点 -->
+    <!-- Offerly 自定义品牌标志：上升轨迹 + 目标点 -->
     <symbol id="i-career" viewBox="0 0 24 24"><path d="M3 19 L8.5 13.5 L12 17 L20 6" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="20" cy="6" r="2.4" fill="currentColor" stroke="none"/><path d="M3 19 L8.5 13.5 L12 17 L20 6" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.3" stroke-width="4"/></symbol>
   </defs>
 </svg>
@@ -2643,11 +2643,11 @@ html.dark .auth-overlay {
             </svg>
             <span class="auth-logo-ring"></span>
           </div>
-          <div class="auth-logo-text">Career<span>Hub</span></div>
+          <div class="auth-logo-text">Offer<span>ly</span></div>
         </div>
         <h2 class="auth-tagline" data-brut-split>
           <span class="brut-line">GET</span>
-          <span class="brut-line brut-line-accent">HIRED<span class="brut-dot">.</span></span>
+          <span class="brut-line brut-line-accent">OFFER<span class="brut-dot">.</span></span>
           <span class="brut-line brut-line-sm">不再焦虑</span>
         </h2>
         <p class="auth-subtext">FOR 2026 / 2027 GRADS · 投递 → 面试 → OFFER · 一站集成</p>
@@ -2792,7 +2792,7 @@ html.dark .auth-overlay {
   <div class="sidebar">
     <div class="logo">
       <div class="logo-icon"><svg class="ic" style="color:#fff"><use href="#i-career"/></svg></div>
-      <div class="logo-text">Career<span>Hub</span></div>
+      <div class="logo-text">Offer<span>ly</span></div>
     </div>
     <div class="nav">
       <div class="nav-item active" data-page="dashboard" data-nav="dashboard"><svg class="ic"><use href="#i-zap"/></svg><span>今日</span></div>
@@ -4504,7 +4504,7 @@ function renderPage(name){
 function appendFooter(main){
   const f = document.createElement('div');
   f.className = 'footer';
-  f.innerHTML = `Made with <span class="heart">❤</span> by <span class="author">杰苏</span> · CareerHub v1.3<br><span style="font-size:11px">⚠️ 免责声明：本工具仅用于个人求职信息整理与学习，所有数据由用户自行录入并保管，作者不对数据准确性、平台可用性、求职结果承担任何责任。</span>`;
+  f.innerHTML = `Made with <span class="heart">❤</span> by <span class="author">杰苏</span> · Offerly v1.5<br><span style="font-size:11px">⚠️ 免责声明：本工具仅用于个人求职信息整理与学习，所有数据由用户自行录入并保管，作者不对数据准确性、平台可用性、求职结果承担任何责任。</span>`;
   main.appendChild(f);
 }
 function openModal(t,b){ document.getElementById('modalTitle').textContent=t; document.getElementById('modalBody').innerHTML=b; document.getElementById('modal').classList.add('active'); }
@@ -5205,7 +5205,7 @@ pages.settings = (main) => {
     </div>
 
     <div style="text-align:center;color:var(--text-lighter);font-size:11px;padding:20px 0">
-      CareerHub v1.0 · Built with ❤️ for 2026 / 2027 grads
+      Offerly v1.5 · Built with ❤️ for 2026 / 2027 grads
     </div>
   `;
 };
@@ -5273,10 +5273,10 @@ async function testServerChan() {
   toast('正在推送测试消息...', 'info');
   try {
     await pushServerChan(
-      'CareerHub · 通知测试',
+      'Offerly · 通知测试',
       `## 推送链路畅通 ✅
 
-来自 **CareerHub** 求职管家。
+来自 **Offerly** 求职管理平台。
 
 - 配置时间：${new Date().toLocaleString('zh-CN')}
 - 设备：${navigator.userAgent.split(')')[0]+')'}
@@ -5413,7 +5413,7 @@ function buildReminderMd({ kind, company, position, time, extra, remindHours }) 
 ${(extra || []).filter(Boolean).map(s => '- ' + s).join('\n')}
 
 ---
-*由 CareerHub 自动推送 · ${new Date().toLocaleString('zh-CN')}*`;
+*由 Offerly 自动推送 · ${new Date().toLocaleString('zh-CN')}*`;
 }
 
 function promptUpgradeAccount() {
@@ -5456,7 +5456,7 @@ async function saveSettings(){
 function exportData(){
   const blob = new Blob([JSON.stringify(DB,null,2)], {type:'application/json'});
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-  a.download = `careerhub_${localDateStr(new Date())}.json`; a.click();
+  a.download = `offerly_${localDateStr(new Date())}.json`; a.click();
   toast('已导出');
 }
 function exportCSV(){
@@ -6525,7 +6525,7 @@ function maybeStartOnboarding(force=false){
     prevBtnText: '← 上一步',
     doneBtnText: '完成 ✓',
     steps:[
-      { popover:{ title:'👋 欢迎使用 CareerHub', description:'2026/2027 届毕业生专属求职助理。<br>10 秒带你看完所有核心功能。'} },
+      { popover:{ title:'👋 欢迎使用 Offerly', description:'2026 / 2027 届毕业生专属求职管理平台。<br>10 秒带你看完所有核心功能。'} },
       { element:'[data-nav="dashboard"]', popover:{ title:'⚡ 今日', description:'第一眼看到本周 deadline、今日面试、求职进度。<br>每天打开它就知道该做什么。' } },
       { element:'[data-nav="jobs"]', popover:{ title:'🎯 求职台', description:'多维表格管理<b>投递记录</b>和<b>意向岗位</b>，支持列表/看板双视图。' } },
       { element:'[data-nav="opp"]', popover:{ title:'📥 公司库', description:'汇聚字节、腾讯、阿里等大厂秋招/春招/实习机会，一键加入求职台。' } },
@@ -6578,8 +6578,8 @@ document.addEventListener('mousemove', e => {
   const ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6366f1"/><stop offset="1" stop-color="#ec4899"/></linearGradient></defs><rect width="512" height="512" rx="110" fill="url(#g)"/><path d="M115 370 L200 290 L257 336 L385 168" stroke="white" stroke-width="38" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="385" cy="168" r="36" fill="white"/></svg>`;
   const iconUrl = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(ICON_SVG)));
   const manifest = {
-    name: 'CareerHub · 求职管家',
-    short_name: 'CareerHub',
+    name: 'Offerly · 求职管理平台',
+    short_name: 'Offerly',
     description: '秋招 / 春招 / 实习一站式管理',
     start_url: location.pathname,
     scope: './',
@@ -6676,7 +6676,7 @@ document.addEventListener('mousemove', e => {
       <div class="pwa-banner-inner">
         <div class="pwa-banner-icon">📲</div>
         <div class="pwa-banner-text">
-          <div class="pwa-banner-title">把 CareerHub 装进主屏幕</div>
+          <div class="pwa-banner-title">把 Offerly 装进主屏幕</div>
           <div class="pwa-banner-sub">离线可开 · 启动飞快 · 像 App 一样用</div>
         </div>
         <button class="pwa-banner-btn primary" id="pwaInstallBtn">安装</button>
@@ -6729,7 +6729,7 @@ document.addEventListener('mousemove', e => {
   window.addEventListener('appinstalled', () => {
     console.log('[PWA] 已安装到主屏幕');
     document.getElementById('pwaInstallBanner')?.remove();
-    if (typeof toast === 'function') toast('🎉 CareerHub 已添加到主屏幕', 'success');
+    if (typeof toast === 'function') toast('🎉 Offerly 已添加到主屏幕', 'success');
   });
 })();
 </script>

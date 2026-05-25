@@ -48,7 +48,27 @@
       "Bash(grep -oE '\"email\"[^,}]{0,80}' /tmp/cb.js)",
       "Bash(grep -oE 'prototype\\\\.\\\\w{3,40}' /tmp/cb.js)",
       "Bash(awk '/prototype\\\\.getVerification=function/{print substr\\($0, index\\($0,\"prototype.getVerification\"\\), 400\\); exit}' /tmp/cb.js)",
-      "Bash(awk '/prototype\\\\.verify=function/{print substr\\($0, index\\($0,\"prototype.verify=\"\\), 400\\); exit}' /tmp/cb.js)"
+      "Bash(awk '/prototype\\\\.verify=function/{print substr\\($0, index\\($0,\"prototype.verify=\"\\), 400\\); exit}' /tmp/cb.js)",
+      "Bash(set -e)",
+      "Bash(mv careerhub-v1-bundle *)",
+      "Bash(mv backend/api-backend backend/api)",
+      "Bash(mv backend/api/vercel/* backend/api/)",
+      "Bash(rmdir backend/api/vercel)",
+      "Bash(sed -i '' 's|careerhub-v1-bundle|backend|g' .github/workflows/deploy.yml)",
+      "Bash(sed -i '' 's|careerhub-v1-bundle|backend|g' .github/workflows/crawler.yml)",
+      "Bash(sed -i '' 's|careerhub-v1-bundle|backend|g' .github/workflows/README.md)",
+      "Bash(sed -i '' 's|careerhub-v1-bundle|backend|g' docs/ARCHITECTURE.md)",
+      "Bash(sed -i '' 's|careerhub-v1-bundle|backend|g' docs/DEPLOY_GITHUB.md)",
+      "Bash(sed -i '' 's|<title>CareerHub · 求职助理</title>|<title>Offerly · 求职管理平台</title>|' careerhub_v1.html)",
+      "Bash(sed -i '' 's|<meta name=\"apple-mobile-web-app-title\" content=\"CareerHub\">|<meta name=\"apple-mobile-web-app-title\" content=\"Offerly\">|' careerhub_v1.html)",
+      "Bash(sed -i '' 's|<!-- CareerHub 自定义品牌标志|<!-- Offerly 自定义品牌标志|' careerhub_v1.html)",
+      "Bash(sed -i '' 's|把 CareerHub 装进主屏幕|把 Offerly 装进主屏幕|' careerhub_v1.html)",
+      "Bash(sed -i '' 's|🎉 CareerHub 已添加到主屏幕|🎉 Offerly 已添加到主屏幕|' careerhub_v1.html)",
+      "Bash(sed -i '' 's| \\\\* CareerHub Service Worker| * Offerly Service Worker|' sw.js)",
+      "Bash(sed -i '' 's|CareerHub|Offerly|g' README.md)",
+      "Bash(sed -i '' 's|CareerHub|Offerly|g' docs/ARCHITECTURE.md)",
+      "Bash(sed -i '' 's|CareerHub|Offerly|g' docs/CHANGELOG.md)",
+      "Bash(sed -i '' 's|CareerHub|Offerly|g' docs/DEPLOY_GITHUB.md)"
     ]
   }
 }

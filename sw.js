@@ -1,10 +1,10 @@
 /* ============================================================
- * CareerHub Service Worker
+ * Offerly Service Worker
  * 部署：把这个文件和 careerhub_v1.html 放在同一目录、同一域名下
  * 注意：必须通过 https 或 http://localhost 才能注册成功
  * ============================================================ */
 
-const CACHE = 'careerhub-v1.1';
+const CACHE = 'offerly-v1.5';
 
 // 安装阶段：跳过等待
 self.addEventListener('install', () => {

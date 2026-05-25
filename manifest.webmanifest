@@ -1,7 +1,7 @@
 {
-  "name": "CareerHub · 求职管家",
-  "short_name": "CareerHub",
-  "description": "秋招 / 春招 / 实习一站式求职管理",
+  "name": "Offerly · 求职管理平台",
+  "short_name": "Offerly",
+  "description": "面向高校毕业生的求职管理平台 · 投递、面试、Offer 一站式追踪",
   "start_url": "./careerhub_v1.html",
   "scope": "./",
   "display": "standalone",

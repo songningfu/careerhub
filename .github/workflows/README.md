@@ -29,7 +29,7 @@
 
 ## 🕷️ crawler.yml · 公司库爬虫
 
-每天 UTC 02:00（北京 10:00）自动抓取 GitHub 招聘合集 → 清洗 → 去重 → commit 回 `careerhub-v1-bundle/data/opportunities.json`。
+每天 UTC 02:00（北京 10:00）自动抓取 GitHub 招聘合集 → 清洗 → 去重 → commit 回 `backend/data/opportunities.json`。
 
 ### 第一次启用
 
@@ -50,11 +50,11 @@ fetch('./data/opportunities.json')
 
 如果用 Public 仓库也可以走 jsDelivr CDN：
 ```
-https://cdn.jsdelivr.net/gh/<你的GitHub用户名>/<仓库名>@main/careerhub-v1-bundle/data/opportunities.json
+https://cdn.jsdelivr.net/gh/<你的GitHub用户名>/<仓库名>@main/backend/data/opportunities.json
 ```
 
 ### 调试
 
-- 改 `careerhub-v1-bundle/crawler/scraper.py` 后 push 即触发
+- 改 `backend/crawler/scraper.py` 后 push 即触发
 - 手动触发：Actions → workflow → Run workflow
 - 跑完去 Actions 页面看「拉取 N 条」的 Step Summary

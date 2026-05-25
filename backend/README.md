@@ -1,15 +1,15 @@
-# CareerHub V1 完整交付包
+# Offerly V1 完整交付包
 
 > 一个面向 2026/2027 届大学生的求职助理 SaaS，基于腾讯云 CloudBase，可直接部署上线。
 
 ## 📦 内容物
 
 ```
-careerhub-v1-bundle/
+backend/
 ├── README.md                    ← 你在看的（总览）
 ├── careerhub_v1.html            ← 主程序（前端单文件，266KB）
 ├── CLOUDBASE_DEPLOY.md          ← 腾讯云部署完整指南（必读）
-├── api-backend/                 ← JD 智能解析后端
+├── api/                 ← JD 智能解析后端
 │   ├── README.md
 │   ├── docs/DEPLOY.md
 │   ├── vercel/                  ← 方案 A：Vercel Edge Function

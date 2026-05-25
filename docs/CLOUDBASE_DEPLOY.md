@@ -1,4 +1,4 @@
-# CareerHub V1 · 腾讯云 CloudBase 一键部署指南
+# Offerly V1 · 腾讯云 CloudBase 一键部署指南
 
 > 目标：把 `careerhub_v1.html` 放到腾讯云上，给真实用户使用。
 > 全程不需要买服务器，CloudBase 免费额度足够 100 人内的小团队使用。
@@ -110,7 +110,7 @@ const CLOUDBASE_ENV_ID = window.CLOUDBASE_ENV_ID || 'careerhub-YOUR-ENV-ID';
 
 ### 5.2 配置 LLM API（可选）
 
-如果你已经部署了上一回的 `careerhub-api-backend`（JD 智能解析后端），同样搜索：
+如果你已经部署了上一回的 `careerhub-api`（JD 智能解析后端），同样搜索：
 
 ```js
 const JD_API_ENDPOINT = window.JD_API_ENDPOINT || 'https://your-app.vercel.app/api/parse-jd';
@@ -132,7 +132,7 @@ const JD_API_ENDPOINT = window.JD_API_ENDPOINT || 'https://your-app.vercel.app/a
 https://careerhub-prod-3g8xxxxx-1234567890.tcloudbaseapp.com
 ```
 
-**用这个 URL 打开就是完整可用的 CareerHub。** 把这个 URL 发给你的同学测试。
+**用这个 URL 打开就是完整可用的 Offerly。** 把这个 URL 发给你的同学测试。
 
 ---
 

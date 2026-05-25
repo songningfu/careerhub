@@ -1,4 +1,4 @@
-# CareerHub - JD 解析 API 部署文档
+# Offerly - JD 解析 API 部署文档
 
 ## 这是什么
 
