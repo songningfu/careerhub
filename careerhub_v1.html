@@ -4882,7 +4882,7 @@ async function tryAutoLogin(){
   hideLoading();
   document.getElementById('authOverlay').style.display='flex';
 }
-function initCloudBase(){ app = cloudbase.init({env:ENV_ID}); auth = app.auth({persistence:'local'}); db = app.database(); }
+function initCloudBase(){ app = cloudbase.init({env:ENV_ID, timeout:120000}); auth = app.auth({persistence:'local'}); db = app.database(); }
 async function handleLogin(){
   const e = val('loginEmail'), p = val('loginPassword');
   if (!e || !p) return showAuthMsg('请输入邮箱和密码', 'error');
@@ -7033,7 +7033,8 @@ async function triggerOpportunityCrawler() {
   try {
     const res = await app.callFunction({
       name: 'opportunityCrawler',
-      data: { action: 'run', trigger: 'manual' }
+      data: { action: 'run', trigger: 'manual' },
+      timeout: 180000
     });
     result = res && res.result;
   } catch (e) {

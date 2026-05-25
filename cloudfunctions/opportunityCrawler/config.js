@@ -9,9 +9,9 @@ module.exports = {
     // 也可以直接写 deepseek-v4-flash（如官方公布该名称）
     model: process.env.DEEPSEEK_MODEL || 'deepseek-chat',
     // 单次批量大小：一次发给 DeepSeek 多少条原始 item
-    batchSize: 20,
+    batchSize: 30,
     // 整次更新最多调多少次 DeepSeek（兜底）
-    maxCalls: 30,
+    maxCalls: 12,
     // 单次请求超时
     timeoutMs: 60000,
     temperature: 0.1
