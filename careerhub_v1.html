@@ -2456,6 +2456,588 @@ html.dark .auth-overlay {
   .auth-container { grid-template-columns: 1fr !important; }
   .auth-brand { display: none !important; }
 }
+
+/* ============================================================================
+   BRUTALIST SKIN  ·  PART 2  —  全页面补齐（dashboard / pipeline / opp / resume / calendar / settings / bitable / overlays）
+   ============================================================================ */
+
+/* ── Page header 公用 ── */
+.page-header > div:first-child { display: flex; flex-direction: column; gap: 6px; }
+.page-title svg, .page-title .ic { display: none !important; }
+
+/* ── Footer ── */
+.footer { font-family: var(--brut-mono) !important; font-size: 11px !important; color: var(--brut-fg-3) !important; text-transform: uppercase; letter-spacing: 1px; padding: 40px 0 20px; border-top: 1.5px solid var(--brut-line); margin-top: 40px; }
+.footer .heart { color: var(--brut-accent) !important; }
+.footer .author { color: var(--brut-fg) !important; font-weight: 700; }
+
+/* ============================================================================
+   1. TODAY DASHBOARD
+   ============================================================================ */
+.today-hero {
+  background: var(--brut-card) !important;
+  border: 1.5px solid var(--brut-line) !important;
+  border-radius: 0 !important;
+  box-shadow: 4px 4px 0 var(--brut-line) !important;
+  padding: 22px !important;
+  margin-bottom: 24px !important;
+}
+.today-hero::before {
+  background: var(--brut-fg) !important;
+  height: 4px !important;
+}
+.today-hero.urgent::before { background: var(--brut-accent) !important; }
+.today-hero.urgent { box-shadow: 4px 4px 0 var(--brut-accent) !important; }
+.today-hero-header h2 {
+  font-family: var(--brut-display) !important;
+  text-transform: uppercase;
+  letter-spacing: -0.3px;
+  font-size: 16px !important;
+}
+.today-hero-header h2 svg, .today-hero-header h2 .ic { display: none !important; }
+.today-hero-header h2::before { content: '// '; color: var(--brut-accent); font-family: var(--brut-mono); }
+.today-hero-count {
+  background: var(--brut-fg) !important;
+  color: var(--brut-bg) !important;
+  border-radius: 0 !important;
+  font-family: var(--brut-mono) !important;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 10px !important;
+  font-size: 11px !important;
+}
+
+.deadline-item {
+  background: var(--brut-bg) !important;
+  border: 1.5px solid var(--brut-line) !important;
+  border-radius: 0 !important;
+  padding: 14px !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s !important;
+}
+.deadline-item:hover {
+  transform: translate(-2px,-2px) !important;
+  box-shadow: 4px 4px 0 var(--brut-line) !important;
+  background: var(--brut-card) !important;
+  border-color: var(--brut-line) !important;
+}
+.deadline-item.urgent {
+  background: var(--brut-card) !important;
+  border-color: var(--brut-accent) !important;
+  border-left-width: 6px !important;
+}
+.deadline-item.urgent:hover { box-shadow: 4px 4px 0 var(--brut-accent) !important; }
+.deadline-day {
+  width: 50px !important; height: 50px !important;
+  background: var(--brut-fg) !important;
+  border: 1.5px solid var(--brut-line) !important;
+  border-radius: 0 !important;
+  color: var(--brut-bg) !important;
+}
+.deadline-day.urgent {
+  background: var(--brut-accent) !important;
+  border-color: var(--brut-accent) !important;
+  color: #fff !important;
+  animation: none !important;
+}
+.deadline-day-num { font-family: var(--brut-display) !important; font-size: 20px !important; letter-spacing: -1px; }
+.deadline-day-unit { font-family: var(--brut-mono) !important; text-transform: uppercase; letter-spacing: 0.5px; }
+.deadline-title { font-family: var(--brut-sans) !important; font-weight: 700 !important; text-transform: uppercase; letter-spacing: -0.2px; font-size: 14px !important; }
+.deadline-sub { font-family: var(--brut-mono) !important; font-size: 11px !important; letter-spacing: 0.3px; }
+.deadline-action {
+  border-radius: 0 !important;
+  background: var(--brut-fg) !important;
+  color: var(--brut-bg) !important;
+}
+.deadline-action:hover { background: var(--brut-accent) !important; transform: none !important; }
+
+.today-empty {
+  background: var(--brut-card) !important;
+  border: 1.5px dashed var(--brut-line) !important;
+  border-radius: 0 !important;
+}
+.today-empty-emoji {
+  font-size: 0 !important;
+  width: 56px; height: 56px;
+  margin: 0 auto 14px;
+  background: var(--brut-fg);
+  position: relative;
+}
+.today-empty-emoji::before {
+  content: ''; position: absolute; inset: 12px;
+  background: var(--brut-accent);
+}
+.today-empty-title { font-family: var(--brut-display) !important; text-transform: uppercase; letter-spacing: -0.5px; }
+.today-empty-desc { font-family: var(--brut-mono) !important; font-size: 12px !important; }
+
+/* Quick stats */
+.quick-stats { gap: 16px !important; margin-bottom: 28px !important; }
+.qstat-card {
+  background: var(--brut-card) !important;
+  border: 1.5px solid var(--brut-line) !important;
+  border-radius: 0 !important;
+  box-shadow: 4px 4px 0 var(--brut-line) !important;
+  padding: 20px !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+.qstat-card::after { display: none !important; }
+.qstat-card::before {
+  content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 4px;
+  background: var(--brut-fg);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.3s cubic-bezier(0.6,0,0.4,1);
+}
+.qstat-card:hover { transform: translate(-3px,-3px) !important; box-shadow: 6px 6px 0 var(--brut-accent) !important; border-color: var(--brut-line) !important; }
+.qstat-card:hover::before { transform: scaleY(1); background: var(--brut-accent); }
+.qstat-card.success::before, .qstat-card.offer::before { background: var(--brut-accent) !important; }
+.qstat-card.offer { border-color: var(--brut-line) !important; }
+.qstat-label {
+  font-family: var(--brut-mono) !important;
+  font-size: 10px !important;
+  color: var(--brut-fg-3) !important;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+.qstat-value {
+  font-family: var(--brut-display) !important;
+  font-size: 48px !important;
+  letter-spacing: -2px !important;
+  line-height: 0.95 !important;
+  margin-top: 8px !important;
+  color: var(--brut-fg) !important;
+  font-variant-numeric: tabular-nums;
+}
+.qstat-card.success .qstat-value, .qstat-card.offer .qstat-value { color: var(--brut-accent) !important; }
+.qstat-trend {
+  font-family: var(--brut-mono) !important;
+  font-size: 10px !important;
+  color: var(--brut-fg-3) !important;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-top: 8px !important;
+}
+
+/* Pipeline bar */
+.pipeline-bar-card {
+  background: var(--brut-card) !important;
+  border: 1.5px solid var(--brut-line) !important;
+  border-radius: 0 !important;
+  box-shadow: 4px 4px 0 var(--brut-line) !important;
+  padding: 22px !important;
+}
+.pl-stage-bar { border: 1.5px solid var(--brut-line) !important; border-radius: 0 !important; height: 14px !important; background: var(--brut-bg) !important; }
+.pl-stage-fill { background: var(--brut-fg) !important; border-radius: 0 !important; }
+.pl-stage-fill::after { display: none !important; }
+.pl-stage-dot { border-radius: 0 !important; background: var(--brut-fg) !important; }
+.pl-stage-label { font-family: var(--brut-mono) !important; font-size: 12px !important; letter-spacing: 0.5px; text-transform: uppercase; color: var(--brut-fg-2) !important; }
+.pl-stage-label b { color: var(--brut-fg) !important; font-family: var(--brut-display) !important; font-size: 14px !important; }
+
+/* Opp quick (dashboard 内嵌) */
+.opp-quick-card {
+  background: var(--brut-bg) !important;
+  border: 1.5px solid var(--brut-line) !important;
+  border-radius: 0 !important;
+  padding: 12px !important;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s !important;
+}
+.opp-quick-card:hover { transform: translate(-2px,-2px); box-shadow: 4px 4px 0 var(--brut-line); background: var(--brut-card) !important; border-color: var(--brut-line) !important; }
+.opp-quick-logo {
+  border-radius: 0 !important;
+  font-family: var(--brut-display) !important;
+  box-shadow: 2px 2px 0 var(--brut-line) !important;
+  width: 38px !important; height: 38px !important;
+  background: var(--brut-fg) !important;
+  color: var(--brut-bg) !important;
+}
+.opp-quick-title { font-family: var(--brut-sans) !important; font-weight: 700 !important; text-transform: uppercase; letter-spacing: -0.2px; }
+.opp-quick-sub { font-family: var(--brut-mono) !important; font-size: 11px !important; }
+.opp-quick-deadline {
+  border-radius: 0 !important;
+  background: transparent !important;
+  border: 1.5px solid var(--brut-line) !important;
+  font-family: var(--brut-mono) !important;
+  font-size: 11px !important;
+  letter-spacing: 0.5px;
+  color: var(--brut-fg) !important;
+  padding: 4px 8px !important;
+}
+.opp-quick-deadline.urgent { background: var(--brut-accent) !important; color: #fff !important; border-color: var(--brut-accent) !important; animation: none !important; }
+
+/* ============================================================================
+   2. COMPANY LIBRARY (opportunities)
+   ============================================================================ */
+.opp-toolbar { margin-bottom: 16px !important; }
+.opp-search {
+  border-radius: 0 !important;
+  border: 1.5px solid var(--brut-line) !important;
+  background: var(--brut-card) !important;
+}
+.opp-search:focus-within { border-color: var(--brut-accent) !important; box-shadow: 3px 3px 0 var(--brut-accent) !important; }
+.opp-search input { font-family: var(--brut-mono) !important; font-size: 13px !important; padding: 12px 10px !important; }
+.opp-search input::placeholder { color: var(--brut-fg-3); letter-spacing: 0.3px; }
+.opp-select {
+  border-radius: 0 !important;
+  border: 1.5px solid var(--brut-line) !important;
+  background: var(--brut-card) !important;
+  font-family: var(--brut-mono) !important;
+  font-size: 12px !important;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 12px 14px !important;
+}
+.opp-tag-bar { gap: 0 !important; margin-bottom: 20px !important; border: 1.5px solid var(--brut-line); background: var(--brut-card); padding: 0; display: flex; flex-wrap: wrap; }
+.opp-tag-pill {
+  border-radius: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  border-right: 1.5px solid var(--brut-line) !important;
+  font-family: var(--brut-mono) !important;
+  font-size: 11px !important;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--brut-fg-2) !important;
+  padding: 8px 16px !important;
+}
+.opp-tag-pill:last-child { border-right: none !important; }
+.opp-tag-pill:hover { background: var(--brut-bg) !important; color: var(--brut-fg) !important; border-color: var(--brut-line) !important; }
+.opp-tag-pill.active { background: var(--brut-fg) !important; color: var(--brut-bg) !important; }
+
+.opp-grid { gap: 16px !important; }
+.opp-card {
+  background: var(--brut-card) !important;
+  border: 1.5px solid var(--brut-line) !important;
+  border-radius: 0 !important;
+  box-shadow: 4px 4px 0 var(--brut-line) !important;
+  padding: 20px !important;
+  transition: transform 0.2s, box-shadow 0.2s !important;
+}
+.opp-card::before { background: var(--brut-fg) !important; height: 4px !important; }
+.opp-card:hover { transform: translate(-3px,-3px) !important; box-shadow: 7px 7px 0 var(--brut-accent) !important; border-color: var(--brut-line) !important; }
+.opp-card.urgent::before { background: var(--brut-accent) !important; height: 6px !important; }
+.opp-card-logo {
+  border-radius: 0 !important;
+  font-family: var(--brut-display) !important;
+  box-shadow: 3px 3px 0 var(--brut-line) !important;
+  background: var(--brut-fg) !important;
+  color: var(--brut-bg) !important;
+  width: 46px !important; height: 46px !important;
+}
+.opp-card-company { font-family: var(--brut-display) !important; text-transform: uppercase; letter-spacing: -0.5px; font-size: 16px !important; }
+.opp-card-industry { font-family: var(--brut-mono) !important; font-size: 10px !important; letter-spacing: 1px; text-transform: uppercase; }
+.opp-applied-badge {
+  border-radius: 0 !important;
+  background: var(--brut-fg) !important;
+  color: var(--brut-bg) !important;
+  font-family: var(--brut-mono) !important;
+  letter-spacing: 0.5px;
+}
+.opp-card-position { font-family: var(--brut-sans) !important; font-weight: 700 !important; text-transform: uppercase; letter-spacing: -0.2px; padding-top: 4px; border-top: 1.5px dashed var(--brut-line); }
+.opp-card-desc { font-family: var(--brut-mono) !important; font-size: 11.5px !important; line-height: 1.65 !important; color: var(--brut-fg-2) !important; }
+.opp-meta-item { font-family: var(--brut-mono) !important; font-size: 11px !important; letter-spacing: 0.3px; }
+.opp-meta-item .ic { display: none !important; }
+.opp-meta-item::before { content: '· '; color: var(--brut-accent); margin-right: 2px; }
+.opp-tag-mini {
+  border-radius: 0 !important;
+  background: transparent !important;
+  border: 1px solid var(--brut-line) !important;
+  font-family: var(--brut-mono) !important;
+  letter-spacing: 0.5px;
+  color: var(--brut-fg) !important;
+}
+
+/* ============================================================================
+   3. RESUME LIBRARY
+   ============================================================================ */
+.resume-toolbar { margin-bottom: 16px !important; }
+.resume-grid { gap: 16px !important; }
+.resume-card {
+  background: var(--brut-card) !important;
+  border: 1.5px solid var(--brut-line) !important;
+  border-radius: 0 !important;
+  box-shadow: 4px 4px 0 var(--brut-line) !important;
+  padding: 18px !important;
+  transition: transform 0.2s, box-shadow 0.2s !important;
+}
+.resume-card::before { background: var(--brut-accent) !important; height: 4px !important; }
+.resume-card:hover { transform: translate(-3px,-3px) !important; box-shadow: 7px 7px 0 var(--brut-accent) !important; border-color: var(--brut-line) !important; }
+.resume-icon {
+  border-radius: 0 !important;
+  background: var(--brut-fg) !important;
+  box-shadow: 2px 2px 0 var(--brut-accent) !important;
+  position: relative;
+  font-size: 0 !important;
+  color: transparent !important;
+}
+.resume-icon::before {
+  content: 'CV';
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--brut-display);
+  font-size: 14px; letter-spacing: 0.5px;
+  color: var(--brut-bg);
+}
+html.dark .resume-icon { background: var(--brut-fg) !important; }
+html.dark .resume-icon::before { color: var(--brut-bg); }
+.resume-name { font-family: var(--brut-display) !important; text-transform: uppercase; letter-spacing: -0.3px; font-size: 16px !important; }
+.resume-card-title { font-family: var(--brut-display) !important; text-transform: uppercase; letter-spacing: -0.3px; }
+.resume-card-meta { font-family: var(--brut-mono) !important; font-size: 11px !important; }
+.resume-target-pill {
+  border-radius: 0 !important;
+  background: var(--brut-accent) !important;
+  color: #fff !important;
+  font-family: var(--brut-mono) !important;
+  letter-spacing: 0.5px;
+  padding: 3px 8px !important;
+  font-size: 10px !important;
+}
+.resume-version {
+  border-radius: 0 !important;
+  background: var(--brut-bg) !important;
+  border: 1px solid var(--brut-line);
+  color: var(--brut-fg) !important;
+  font-family: var(--brut-mono) !important;
+  letter-spacing: 0.5px;
+}
+.resume-notes {
+  background: var(--brut-bg) !important;
+  border-radius: 0 !important;
+  border-left: 3px solid var(--brut-line);
+  font-family: var(--brut-mono) !important;
+  font-size: 11.5px !important;
+  line-height: 1.65;
+}
+.resume-stat { font-family: var(--brut-mono) !important; font-size: 11px !important; }
+.resume-card-actions { border-top: 1.5px dashed var(--brut-line) !important; }
+.resume-btn-ghost {
+  border-radius: 0 !important;
+  background: var(--brut-bg) !important;
+  border: 1px solid var(--brut-line) !important;
+  color: var(--brut-fg) !important;
+  font-family: var(--brut-mono) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-size: 11px !important;
+}
+.resume-btn-ghost:hover { background: var(--brut-fg) !important; color: var(--brut-bg) !important; border-color: var(--brut-line) !important; }
+.resume-btn-danger {
+  border-radius: 0 !important;
+  background: var(--brut-accent) !important;
+  color: #fff !important;
+  border: 1px solid var(--brut-accent) !important;
+}
+.resume-tip {
+  background: var(--brut-bg) !important;
+  border-left: 4px solid var(--brut-accent) !important;
+  border-radius: 0 !important;
+  font-family: var(--brut-mono) !important;
+  font-size: 12px !important;
+  padding: 12px 14px !important;
+  margin-bottom: 10px;
+}
+.resume-tip b { font-family: var(--brut-sans) !important; text-transform: uppercase; letter-spacing: 0.5px; color: var(--brut-fg) !important; }
+.resume-empty { border-radius: 0 !important; border: 1.5px dashed var(--brut-line) !important; }
+
+/* ============================================================================
+   4. CALENDAR
+   ============================================================================ */
+.calendar-wrap {
+  background: var(--brut-card) !important;
+  border: 1.5px solid var(--brut-line) !important;
+  border-radius: 0 !important;
+  backdrop-filter: none !important;
+  box-shadow: 4px 4px 0 var(--brut-line) !important;
+  padding: 22px !important;
+}
+.calendar-month { font-family: var(--brut-display) !important; text-transform: uppercase; letter-spacing: -0.5px; font-size: 22px !important; }
+.calendar-nav button {
+  border-radius: 0 !important;
+  background: var(--brut-bg) !important;
+  border: 1.5px solid var(--brut-line) !important;
+  color: var(--brut-fg) !important;
+}
+.calendar-nav button:hover { background: var(--brut-fg) !important; color: var(--brut-bg) !important; transform: none !important; }
+.calendar-weekday { font-family: var(--brut-mono) !important; color: var(--brut-fg-3) !important; letter-spacing: 1px; }
+.calendar-day {
+  border-radius: 0 !important;
+  background: var(--brut-card) !important;
+  border: 1.5px solid var(--brut-line) !important;
+  transition: transform 0.15s, box-shadow 0.15s !important;
+}
+.calendar-day:hover { transform: translate(-2px,-2px) !important; box-shadow: 3px 3px 0 var(--brut-accent) !important; border-color: var(--brut-line) !important; }
+.calendar-day.other-month { opacity: 0.3; }
+.calendar-day.today { background: var(--brut-fg) !important; color: var(--brut-bg) !important; border-color: var(--brut-line) !important; }
+.calendar-day.today .day-num { color: var(--brut-bg) !important; font-family: var(--brut-display) !important; }
+.calendar-day.has-event { border-color: var(--brut-accent) !important; border-width: 2px !important; }
+.calendar-day .day-num { font-family: var(--brut-mono) !important; font-weight: 700; }
+.calendar-day .day-event { font-family: var(--brut-mono) !important; font-size: 9px !important; letter-spacing: 0.3px; }
+.calendar-day.today .day-event { background: var(--brut-accent) !important; color: #fff !important; }
+
+/* ============================================================================
+   5. SETTINGS
+   ============================================================================ */
+.settings-anon-tag, .settings-cloud-tag {
+  font-family: var(--brut-mono) !important;
+  border-radius: 0 !important;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 6px 10px !important;
+  border: 1.5px solid currentColor;
+}
+.settings-anon-tag { background: transparent !important; color: var(--brut-accent) !important; }
+.settings-cloud-tag { background: transparent !important; color: var(--brut-fg) !important; }
+.settings-stat-icon {
+  border-radius: 0 !important;
+  background: var(--brut-fg) !important;
+  color: var(--brut-bg) !important;
+  font-size: 0 !important;
+  position: relative;
+  box-shadow: 2px 2px 0 var(--brut-accent) !important;
+}
+.settings-stat-icon::before {
+  content: '';
+  position: absolute; left: 30%; right: 30%; top: 30%; bottom: 30%;
+  background: var(--brut-accent);
+}
+
+/* ============================================================================
+   6. BITABLE (求职台多维表)
+   ============================================================================ */
+.bitable, .bt-shell {
+  background: var(--brut-card) !important;
+  border: 1.5px solid var(--brut-line) !important;
+  border-radius: 0 !important;
+  box-shadow: 4px 4px 0 var(--brut-line) !important;
+}
+.bt-header {
+  background: var(--brut-bg) !important;
+  border-bottom: 1.5px solid var(--brut-line) !important;
+  border-radius: 0 !important;
+  padding: 10px 14px !important;
+}
+.bt-title { font-family: var(--brut-display) !important; text-transform: uppercase; letter-spacing: -0.3px; color: var(--brut-fg) !important; }
+.bt-views {
+  background: var(--brut-card) !important;
+  border: 1.5px solid var(--brut-line) !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  gap: 0 !important;
+}
+.bt-view-tab {
+  border-radius: 0 !important;
+  font-family: var(--brut-mono) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 11px !important;
+  color: var(--brut-fg-2) !important;
+  padding: 6px 12px !important;
+  border-right: 1px solid var(--brut-line);
+}
+.bt-view-tab:last-child { border-right: none; }
+.bt-view-tab:hover { background: var(--brut-bg) !important; color: var(--brut-fg) !important; }
+.bt-view-tab.active { background: var(--brut-fg) !important; color: var(--brut-bg) !important; box-shadow: none !important; }
+.bt-btn {
+  border-radius: 0 !important;
+  border: 1.5px solid var(--brut-line) !important;
+  background: var(--brut-card) !important;
+  font-family: var(--brut-mono) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-size: 11px !important;
+  color: var(--brut-fg) !important;
+}
+.bt-btn:hover { background: var(--brut-fg) !important; color: var(--brut-bg) !important; border-color: var(--brut-line) !important; }
+.bt-btn.primary { background: var(--brut-fg) !important; color: var(--brut-bg) !important; border-color: var(--brut-line) !important; box-shadow: 2px 2px 0 var(--brut-accent) !important; }
+.bt-btn.primary:hover { background: var(--brut-accent) !important; border-color: var(--brut-accent) !important; box-shadow: 3px 3px 0 var(--brut-line) !important; }
+.bt-btn-ghost { border-radius: 0 !important; }
+.bt-btn-ghost:hover { background: var(--brut-bg) !important; }
+.bt-subbar { background: var(--brut-bg) !important; border-bottom: 1.5px solid var(--brut-line) !important; }
+.bt-chip {
+  border-radius: 0 !important;
+  border: 1px solid var(--brut-line) !important;
+  background: var(--brut-card) !important;
+  font-family: var(--brut-mono) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  font-size: 11px !important;
+  color: var(--brut-fg) !important;
+}
+.bt-chip:hover { background: var(--brut-bg) !important; border-color: var(--brut-line) !important; }
+.bt-chip.active { background: var(--brut-fg) !important; color: var(--brut-bg) !important; border-color: var(--brut-line) !important; }
+.bt-search {
+  border-radius: 0 !important;
+  border: 1.5px solid var(--brut-line) !important;
+  background: var(--brut-card) !important;
+  font-family: var(--brut-mono) !important;
+  font-size: 12px !important;
+}
+.bt-search:focus { border-color: var(--brut-accent) !important; box-shadow: 2px 2px 0 var(--brut-accent) !important; }
+.bt-cell { border-right: 1px solid var(--brut-line) !important; border-bottom: 1px solid var(--brut-line) !important; }
+.bt-cell.header { background: var(--brut-bg) !important; font-family: var(--brut-mono) !important; text-transform: uppercase; letter-spacing: 0.5px; color: var(--brut-fg-2) !important; }
+.bt-cell.row-num { background: var(--brut-bg) !important; font-family: var(--brut-mono) !important; color: var(--brut-fg-3) !important; }
+.bt-row:hover .bt-cell { background: rgba(255,61,0,0.04) !important; }
+.bt-row:hover .bt-cell.row-num { background: var(--brut-accent) !important; color: #fff !important; }
+.bt-row.row-chosen .bt-cell { background: rgba(255,61,0,0.08) !important; box-shadow: none !important; }
+.bt-field-name { font-family: var(--brut-mono) !important; color: var(--brut-fg) !important; letter-spacing: 0.5px; }
+.bt-field-type-icon { border-radius: 0 !important; }
+
+/* ============================================================================
+   7. QUICK ADD / TOAST / JD PARSER
+   ============================================================================ */
+.quick-add-overlay { background: rgba(10,10,10,0.55) !important; backdrop-filter: none !important; }
+.quick-add-box {
+  border-radius: 0 !important;
+  border: 2px solid var(--brut-line) !important;
+  box-shadow: 8px 8px 0 var(--brut-accent) !important;
+}
+.quick-add-input-wrap { border-bottom: 1.5px solid var(--brut-line) !important; padding: 0 22px !important; }
+.quick-add-input-wrap .ic { color: var(--brut-accent) !important; }
+.quick-add-input { font-family: var(--brut-sans) !important; font-weight: 600 !important; font-size: 18px !important; }
+.quick-add-hint { background: var(--brut-bg) !important; font-family: var(--brut-mono) !important; text-transform: uppercase; letter-spacing: 0.5px; }
+.quick-add-hint kbd { border-radius: 0 !important; border: 1px solid var(--brut-line) !important; background: var(--brut-card) !important; font-family: var(--brut-mono) !important; }
+
+.toast {
+  border-radius: 0 !important;
+  background: var(--brut-card) !important;
+  border: 1.5px solid var(--brut-line) !important;
+  border-left-width: 6px !important;
+  box-shadow: 4px 4px 0 var(--brut-line) !important;
+  font-family: var(--brut-sans) !important;
+  font-weight: 600 !important;
+}
+.toast.success { border-left-color: var(--brut-fg) !important; }
+.toast.error { border-left-color: var(--brut-accent) !important; box-shadow: 4px 4px 0 var(--brut-accent) !important; }
+.toast.info { border-left-color: var(--brut-fg-2) !important; }
+
+.jd-tip {
+  background: var(--brut-bg) !important;
+  color: var(--brut-fg) !important;
+  border-left: 4px solid var(--brut-accent) !important;
+  border-radius: 0 !important;
+  font-family: var(--brut-mono) !important;
+}
+.jd-textarea {
+  border-radius: 0 !important;
+  border: 1.5px solid var(--brut-line) !important;
+  font-family: var(--brut-mono) !important;
+}
+.jd-textarea:focus { border-color: var(--brut-accent) !important; box-shadow: 3px 3px 0 var(--brut-accent) !important; }
+.jd-parsing-spinner { border-radius: 0 !important; border-top-color: var(--brut-accent) !important; }
+.jd-result-header { border-radius: 0 !important; background: transparent !important; color: var(--brut-fg) !important; border-left: 4px solid var(--brut-fg) !important; font-family: var(--brut-mono) !important; }
+
+/* tag-amber / 其它遗漏 */
+.tag-amber { background: transparent !important; color: var(--brut-accent) !important; border: 1px solid var(--brut-accent) !important; }
+
+/* 季节倒计时（dashboard 顶部） */
+.season-chip, .season-countdown { font-family: var(--brut-mono) !important; text-transform: uppercase; letter-spacing: 0.8px; color: var(--brut-accent) !important; }
+
+/* 强制 page-subtitle 用 mono */
+.page-subtitle b { color: var(--brut-accent) !important; font-family: var(--brut-display) !important; font-size: 14px !important; }
+
+/* 头像 / nav-badge 进一步统一 */
+.nav-badge { background: var(--brut-accent) !important; }
+
+/* 设置页 stats cards 通用 */
+.settings-stats { display: grid; gap: 14px; }
+.settings-stat { background: var(--brut-card) !important; border: 1.5px solid var(--brut-line) !important; border-radius: 0 !important; box-shadow: 4px 4px 0 var(--brut-line) !important; }
 </style>
 
 <!-- Brutalist behavior: hero 字符切片翻入 -->
@@ -2654,21 +3236,21 @@ html.dark .auth-overlay {
 
         <div class="auth-features">
           <div class="auth-feature">
-            <div class="auth-feature-icon" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">📥</div>
+            <div class="auth-feature-icon" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)"></div>
             <div class="auth-feature-text">
               <div class="auth-feature-title">公司库聚合</div>
               <div class="auth-feature-desc">字节/腾讯/阿里等机会自动汇聚</div>
             </div>
           </div>
           <div class="auth-feature">
-            <div class="auth-feature-icon" style="background:linear-gradient(135deg,#10b981,#34d399)">⚡</div>
+            <div class="auth-feature-icon" style="background:linear-gradient(135deg,#10b981,#34d399)"></div>
             <div class="auth-feature-text">
               <div class="auth-feature-title">JD 智能解析</div>
               <div class="auth-feature-desc">粘贴 JD 自动建条目，5 秒入库</div>
             </div>
           </div>
           <div class="auth-feature">
-            <div class="auth-feature-icon" style="background:linear-gradient(135deg,#f59e0b,#fbbf24)">📄</div>
+            <div class="auth-feature-icon" style="background:linear-gradient(135deg,#f59e0b,#fbbf24)">[TXT]</div>
             <div class="auth-feature-text">
               <div class="auth-feature-title">简历版本管理</div>
               <div class="auth-feature-desc">为每个岗位定制简历，追踪投递效果</div>
@@ -2694,7 +3276,7 @@ html.dark .auth-overlay {
         <!-- 登录表单 -->
         <div id="loginForm" class="auth-form-pane">
           <div class="auth-welcome">
-            <div class="auth-welcome-emoji">👋</div>
+            <div class="auth-welcome-emoji"></div>
             <div>
               <div class="auth-welcome-title">欢迎回来</div>
               <div class="auth-welcome-sub">登录继续你的求职之旅</div>
@@ -2738,7 +3320,7 @@ html.dark .auth-overlay {
         <!-- 注册表单 -->
         <div id="registerForm" class="auth-form-pane" style="display:none">
           <div class="auth-welcome">
-            <div class="auth-welcome-emoji">🚀</div>
+            <div class="auth-welcome-emoji"></div>
             <div>
               <div class="auth-welcome-title">创建账号</div>
               <div class="auth-welcome-sub">开启你的求职管理之旅</div>
@@ -2833,7 +3415,7 @@ html.dark .auth-overlay {
     <div class="quick-suggest" id="quickSuggest"></div>
     <div class="quick-add-hint">
       <span><kbd>↑↓</kbd> 选择 <kbd>Enter</kbd> 确认 <kbd>Esc</kbd> 关闭</span>
-      <span>💡 模糊搜索全模块</span>
+      <span>//模糊搜索全模块</span>
     </div>
   </div>
 </div>
@@ -3107,7 +3689,7 @@ function celebrateOffer() {
 }
 function celebrateMilestone(message) {
   confetti({ particleCount:60, spread:70, origin:{y:0.6}, colors:['#6366f1','#10b981','#fbbf24'] });
-  toast(`🎉 ${message}`, 'success');
+  toast(`${message}`, 'success');
 }
 
 const APP_STATUS=['未投递','已投递','简历筛选','笔试','一面','二面','三面','HR面','Offer','已拒绝','已结束'];
@@ -3133,16 +3715,16 @@ function formatFileSize(b){
 }
 function fileIconByName(name){
   const ext = (name||'').split('.').pop().toLowerCase();
-  if (['pdf'].includes(ext)) return '📕';
-  if (['doc','docx'].includes(ext)) return '📘';
-  if (['xls','xlsx','csv'].includes(ext)) return '📗';
-  if (['ppt','pptx'].includes(ext)) return '📙';
-  if (['jpg','jpeg','png','gif','webp','svg'].includes(ext)) return '🖼️';
-  if (['zip','rar','7z'].includes(ext)) return '🗜️';
-  if (['mp4','mov','avi','mkv'].includes(ext)) return '🎬';
-  if (['mp3','wav','flac'].includes(ext)) return '🎵';
-  if (['txt','md'].includes(ext)) return '📄';
-  return '📎';
+  if (['pdf'].includes(ext)) return '[PDF]';
+  if (['doc','docx'].includes(ext)) return '[DOC]';
+  if (['xls','xlsx','csv'].includes(ext)) return '[XLS]';
+  if (['ppt','pptx'].includes(ext)) return '[PPT]';
+  if (['jpg','jpeg','png','gif','webp','svg'].includes(ext)) return '[IMG]';
+  if (['zip','rar','7z'].includes(ext)) return '[ZIP]';
+  if (['mp4','mov','avi','mkv'].includes(ext)) return '[VID]';
+  if (['mp3','wav','flac'].includes(ext)) return '[AUD]';
+  if (['txt','md'].includes(ext)) return '[TXT]';
+  return '[FILE]';
 }
 async function uploadAttachment(file){
   if (!file) return null;
@@ -3223,7 +3805,7 @@ function renderAttachmentBlock(attachments, onChange){
           <div class="att-icon">${fileIconByName(a.name)}</div>
           <div class="att-info">
             <div class="att-name" data-att-open="${id}" data-idx="${i}" title="点击打开">${escHtml(a.name)}</div>
-            <div class="att-meta">${formatFileSize(a.size)} · ${a.storedAt==='cloud'?'☁️ 云端':'💾 本地'}</div>
+            <div class="att-meta">${formatFileSize(a.size)} · ${a.storedAt==='cloud'?'[CLOUD]云端':'[LOCAL]本地'}</div>
           </div>
           <button class="att-del" data-att-del="${id}" data-idx="${i}" title="删除"><svg class="ic ic-sm"><use href="#i-trash"/></svg></button>
         </div>`).join('')}
@@ -3414,7 +3996,7 @@ class Bitable {
               // Offer 撒花
               if (this.groupBy === 'status' && newStatus === 'Offer' && oldVal !== 'Offer'){
                 celebrateOffer();
-                toast(`🎉 恭喜拿到 ${row.company || '一个'} 的 Offer！`, 'success');
+                toast(`恭喜拿到 ${row.company || '一个'} 的 Offer！`, 'success');
               } else {
                 toast(`已移动到「${newStatus}」`, 'success');
               }
@@ -3647,7 +4229,7 @@ class Bitable {
         // 检测 Offer 达成
         if (this.collection === 'applications' && fk === 'status' && v === 'Offer' && row[fk] !== 'Offer'){
           celebrateOffer();
-          toast(`🎉 恭喜拿到 ${row.company || '一个'} 的 Offer！`, 'success');
+          toast(`恭喜拿到 ${row.company || '一个'} 的 Offer！`, 'success');
         }
         row[fk] = v;
         this._save('update', row, prev);
@@ -3752,7 +4334,7 @@ class Bitable {
       // Offer 撒花检测
       if (this.collection === 'applications' && fieldKey === 'status' && nv === 'Offer' && row[fieldKey] !== 'Offer'){
         celebrateOffer();
-        toast(`🎉 恭喜拿到 ${row.company || '一个'} 的 Offer！`, 'success');
+        toast(`恭喜拿到 ${row.company || '一个'} 的 Offer！`, 'success');
       }
       row[fieldKey] = nv;
       this._save('update', row, prev);
@@ -4251,7 +4833,7 @@ async function sendRegisterCode(){
     _regVerificationId = res?.verification_id || res?.verificationId;
     if (!_regVerificationId) throw new Error('返回数据缺 verification_id');
     document.getElementById('regCodeWrap').style.display = 'block';
-    showAuthMsg('✉️ 验证码已发送，60s 内有效，请到邮箱查收（含垃圾箱）','success');
+    showAuthMsg('MAIL:验证码已发送，60s 内有效，请到邮箱查收（含垃圾箱）','success');
     document.getElementById('regCode')?.focus();
     // 60s 倒计时
     _regCountdown = 60;
@@ -4308,7 +4890,7 @@ async function handleRegister(){
       throw new Error('当前 SDK 版本不支持邮箱注册');
     }
 
-    showAuthMsg('✅ 注册成功！正在跳转登录...','success',false);
+    showAuthMsg('✓注册成功！正在跳转登录...','success',false);
     // 重置缓冲
     _regVerificationId = null;
     _regVerificationToken = null;
@@ -4458,7 +5040,7 @@ function updateUserUI(){
 }
 
 function promptGraduation(){
-  openModal('🎓 设置毕业时间', `
+  openModal('设置毕业时间', `
     <p style="color:var(--text-light);margin-bottom:16px;line-height:1.7">告诉我你的毕业时间，我会自动倒计时，帮你规划秋招/春招/实习节奏。</p>
     <div class="form-group"><label>预计毕业年月</label><input type="month" id="f_grad" value="${DB.settings?.graduation||'2027-06'}"></div>
     <div class="form-group"><label>你的称呼（可选）</label><input id="f_gradName" value="${escHtml(DB.settings?.name||'')}" placeholder="如：小明"></div>
@@ -4475,7 +5057,7 @@ async function saveGraduation(){
   if (n) DB.settings.name = n;
   await persistSettings();
   closeModal(); updateUserUI(); renderPage('dashboard');
-  toast('已保存，开始你的求职之旅 🚀');
+  toast('已保存，开始你的求职之旅 ');
   setTimeout(()=>maybeStartOnboarding(), 500);
 }
 
@@ -4504,7 +5086,7 @@ function renderPage(name){
 function appendFooter(main){
   const f = document.createElement('div');
   f.className = 'footer';
-  f.innerHTML = `Made with <span class="heart">❤</span> by <span class="author">杰苏</span> · Offerly v1.5<br><span style="font-size:11px">⚠️ 免责声明：本工具仅用于个人求职信息整理与学习，所有数据由用户自行录入并保管，作者不对数据准确性、平台可用性、求职结果承担任何责任。</span>`;
+  f.innerHTML = `Made with <span class="heart">●</span> by <span class="author">杰苏</span> · Offerly v1.5<br><span style="font-size:11px">!免责声明：本工具仅用于个人求职信息整理与学习，所有数据由用户自行录入并保管，作者不对数据准确性、平台可用性、求职结果承担任何责任。</span>`;
   main.appendChild(f);
 }
 function openModal(t,b){ document.getElementById('modalTitle').textContent=t; document.getElementById('modalBody').innerHTML=b; document.getElementById('modal').classList.add('active'); }
@@ -4544,10 +5126,10 @@ pages.dashboard = (main) => {
   main.innerHTML = `
     <div class="page-header">
       <div>
-        <div class="page-title">👋 ${getGreeting()}，${escHtml(DB.settings.name)}</div>
+        <div class="page-title"><span class="brut-greet">${getGreeting()}</span> · ${escHtml(DB.settings.name)}</div>
         <div class="page-subtitle" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
           ${gradDays !== null ? `<span>距离毕业 <b style="color:var(--primary)">${gradDays}</b> 天</span>` : ''}
-          <span>· ${MODE==='local'?'💾 本地模式':'☁️ 云端已同步'}</span>
+          <span>· ${MODE==='local'?'[LOCAL]本地模式':'[CLOUD]云端已同步'}</span>
           ${renderSeasonCountdown()}
         </div>
       </div>
@@ -4569,7 +5151,7 @@ pages.dashboard = (main) => {
       </div>
     ` : `
       <div class="today-empty">
-        <div class="today-empty-emoji">☕</div>
+        <div class="today-empty-emoji"></div>
         <div class="today-empty-title">本周没有紧急任务</div>
         <div class="today-empty-desc">趁机刷一道题，或者去公司库看看有什么新机会</div>
       </div>
@@ -4579,7 +5161,7 @@ pages.dashboard = (main) => {
       <div class="qstat-card" onclick="document.querySelector('.nav-item[data-page=pipeline]').click()">
         <div class="qstat-label">总投递</div>
         <div class="qstat-value" data-target="${apps.length}">0</div>
-        <div class="qstat-trend">${apps.length ? '已开跑 🚀' : '点击开始'}</div>
+        <div class="qstat-trend">${apps.length ? '已开跑 ' : '点击开始'}</div>
       </div>
       <div class="qstat-card" onclick="document.querySelector('.nav-item[data-page=pipeline]').click()">
         <div class="qstat-label">进行中</div>
@@ -4589,12 +5171,12 @@ pages.dashboard = (main) => {
       <div class="qstat-card success" onclick="document.querySelector('.nav-item[data-page=pipeline]').click()">
         <div class="qstat-label">面试中</div>
         <div class="qstat-value" data-target="${stages['面试']}">0</div>
-        <div class="qstat-trend">${stages['面试'] ? '冲鸭 💪' : '加油加油'}</div>
+        <div class="qstat-trend">${stages['面试'] ? '冲鸭 ' : '加油加油'}</div>
       </div>
       <div class="qstat-card offer" onclick="document.querySelector('.nav-item[data-page=pipeline]').click()">
         <div class="qstat-label">Offer</div>
         <div class="qstat-value" data-target="${stages.Offer}">0</div>
-        <div class="qstat-trend">${stages.Offer ? '收获满满 🎉' : '继续加油'}</div>
+        <div class="qstat-trend">${stages.Offer ? '收获满满 ' : '继续加油'}</div>
       </div>
     </div>
 
@@ -4672,7 +5254,7 @@ function renderDeadlineItem(e, isToday) {
 }
 
 function renderPipelineBar(stages, total) {
-  if (!total) return `<div style="text-align:center;color:var(--text-lighter);padding:20px">还没有投递，开始你的第一份吧 🚀</div>`;
+  if (!total) return `<div style="text-align:center;color:var(--text-lighter);padding:20px">还没有投递，开始你的第一份吧 </div>`;
   const items = [
     { count: stages['已投'], color: '#6366f1', label: '已投' },
     { count: stages['笔试'], color: '#a78bfa', label: '笔试' },
@@ -4771,7 +5353,7 @@ function drawDashboardCharts(apps, health){
 }
 function renderUpcoming(){
   const items = (DB.events||[]).filter(e=>!e.done).sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,5);
-  if (!items.length) return `<div class="empty"><div class="empty-title">暂无待办</div><div class="empty-desc">所有任务都已完成 🎉</div></div>`;
+  if (!items.length) return `<div class="empty"><div class="empty-title">暂无待办</div><div class="empty-desc">所有任务都已完成 </div></div>`;
   return '<div class="timeline">' + items.map(e=>{
     const d = daysFromNow(e.date);
     const urg = d<=3?'urgent':'';
@@ -4794,7 +5376,7 @@ pages.pipeline = (main)=>{
   main.innerHTML = `
     <div class="page-header">
       <div>
-        <div class="page-title">🎯 求职台</div>
+        <div class="page-title">求职台</div>
         <div class="page-subtitle">多维表格 · 飞书同款交互 · 支持表格/看板/画廊/日历四视图</div>
       </div>
     </div>
@@ -4883,7 +5465,7 @@ pages.calendar = (main)=>{
   main.innerHTML = `
     <div class="page-header">
       <div>
-        <div class="page-title">📅 日历</div>
+        <div class="page-title">日历</div>
         <div class="page-subtitle">面试、笔试、deadline 全在这里 · 自动同步投递</div>
       </div>
       <button class="btn btn-primary" onclick="openEventModal()"><svg class="ic ic-sm"><use href="#i-plus"/></svg>添加日程</button>
@@ -5010,7 +5592,7 @@ function openDayDetail(ds){
   }
   if (!evts.length && !autos.length) html += '<div class="empty"><div class="empty-title">这天还没有安排</div></div>';
   html += `<div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal()">关闭</button><button class="btn btn-primary" onclick="openEventModal('${ds}')"><svg class="ic ic-sm"><use href="#i-plus"/></svg>添加日程</button></div>`;
-  openModal(`📅 ${ds}`, html);
+  openModal(ds, html);
 }
 function openEventModal(d=null){
   openModal('添加日程', `
@@ -5062,7 +5644,7 @@ pages.settings = (main) => {
   main.innerHTML = `
     <div class="page-header">
       <div>
-        <div class="page-title">⚙️ 设置</div>
+        <div class="page-title">设置</div>
         <div class="page-subtitle">个人信息、账户管理、数据导出</div>
       </div>
     </div>
@@ -5092,7 +5674,7 @@ pages.settings = (main) => {
           <div class="settings-account-info">
             <div class="settings-account-name">${escHtml(DB.settings.name || '用户')}</div>
             <div class="settings-account-email">${escHtml(userEmail)}</div>
-            ${isAnon ? `<div class="settings-anon-tag">⚠️ 访客模式 · 数据仅本设备可见</div>` : `<div class="settings-cloud-tag">☁️ 云端账户 · 多设备同步</div>`}
+            ${isAnon ? `<div class="settings-anon-tag">!访客模式 · 数据仅本设备可见</div>` : `<div class="settings-cloud-tag">[CLOUD]云端账户 · 多设备同步</div>`}
           </div>
         </div>
         <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
@@ -5113,7 +5695,7 @@ pages.settings = (main) => {
       <div class="card-title-bar"><h3><svg class="ic"><use href="#i-trending"/></svg> 数据概览</h3></div>
       <div class="settings-stats">
         <div class="settings-stat-card">
-          <div class="settings-stat-icon" style="background:linear-gradient(135deg,#6366f1,#818cf8)">📤</div>
+          <div class="settings-stat-icon" style="background:linear-gradient(135deg,#6366f1,#818cf8)"></div>
           <div class="settings-stat-info"><div class="settings-stat-label">总投递</div><div class="settings-stat-value">${stats.apps}</div></div>
         </div>
         <div class="settings-stat-card">
@@ -5121,19 +5703,19 @@ pages.settings = (main) => {
           <div class="settings-stat-info"><div class="settings-stat-label">进行中</div><div class="settings-stat-value">${stats.inProgress}</div></div>
         </div>
         <div class="settings-stat-card">
-          <div class="settings-stat-icon" style="background:linear-gradient(135deg,#10b981,#34d399)">🏆</div>
+          <div class="settings-stat-icon" style="background:linear-gradient(135deg,#10b981,#34d399)"></div>
           <div class="settings-stat-info"><div class="settings-stat-label">Offer</div><div class="settings-stat-value">${stats.offers}</div></div>
         </div>
         <div class="settings-stat-card">
-          <div class="settings-stat-icon" style="background:linear-gradient(135deg,#a855f7,#c084fc)">🎯</div>
+          <div class="settings-stat-icon" style="background:linear-gradient(135deg,#a855f7,#c084fc)"></div>
           <div class="settings-stat-info"><div class="settings-stat-label">意向岗位</div><div class="settings-stat-value">${stats.jobs}</div></div>
         </div>
         <div class="settings-stat-card">
-          <div class="settings-stat-icon" style="background:linear-gradient(135deg,#ec4899,#f472b6)">📅</div>
+          <div class="settings-stat-icon" style="background:linear-gradient(135deg,#ec4899,#f472b6)"></div>
           <div class="settings-stat-info"><div class="settings-stat-label">待办</div><div class="settings-stat-value">${stats.events}</div></div>
         </div>
         <div class="settings-stat-card">
-          <div class="settings-stat-icon" style="background:linear-gradient(135deg,#0ea5e9,#38bdf8)">📄</div>
+          <div class="settings-stat-icon" style="background:linear-gradient(135deg,#0ea5e9,#38bdf8)">[TXT]</div>
           <div class="settings-stat-info"><div class="settings-stat-label">简历版本</div><div class="settings-stat-value">${stats.resumes}</div></div>
         </div>
       </div>
@@ -5199,13 +5781,13 @@ pages.settings = (main) => {
         <button class="btn btn-danger btn-sm" onclick="clearAll()"><svg class="ic ic-sm"><use href="#i-trash"/></svg>清空所有数据</button>
       </div>
       <p style="margin-top:12px;color:var(--text-lighter);font-size:12px;line-height:1.6">
-        💡 云端模式数据自动保存到腾讯云 CloudBase。建议每月导出一次 JSON 做本地备份。<br>
-        ⚠️ 「清空所有数据」会删除你的投递、意向、简历、日程等全部记录，不可恢复！
+        //云端模式数据自动保存到腾讯云 CloudBase。建议每月导出一次 JSON 做本地备份。<br>
+        !「清空所有数据」会删除你的投递、意向、简历、日程等全部记录，不可恢复！
       </p>
     </div>
 
     <div style="text-align:center;color:var(--text-lighter);font-size:11px;padding:20px 0">
-      Offerly v1.5 · Built with ❤️ for 2026 / 2027 grads
+      Offerly v1.5 · Built with ● for 2026 / 2027 grads
     </div>
   `;
 };
@@ -5274,7 +5856,7 @@ async function testServerChan() {
   try {
     await pushServerChan(
       'Offerly · 通知测试',
-      `## 推送链路畅通 ✅
+      `## 推送链路畅通 ✓
 
 来自 **Offerly** 求职管理平台。
 
@@ -5283,10 +5865,10 @@ async function testServerChan() {
 
 接下来 deadline 前 ${getRemindHours()} 小时会自动推送到这里。`
     );
-    toast('✅ 推送成功，请打开微信查收', 'success');
+    toast('✓推送成功，请打开微信查收', 'success');
   } catch (e) {
     console.error(e);
-    toast('❌ 推送失败：' + (e.message || '未知错误'), 'error');
+    toast('✕推送失败：' + (e.message || '未知错误'), 'error');
   }
 }
 
@@ -5350,7 +5932,7 @@ async function runDeadlineReminderScan() {
       const fp = `app:${a.id}:interview:${a.interviewDate}`;
       if (!pushed[fp]) reminders.push({
         fp,
-        title: `🎯 ${a.company || ''} ${a.position || ''} 面试提醒`,
+        title: ` ${a.company || ''} ${a.position || ''} 面试提醒`,
         kind: 'interview',
         desp: buildReminderMd({
           kind: 'interview',
@@ -5396,7 +5978,7 @@ async function runDeadlineReminderScan() {
   localStorage.setItem(pushedKey, JSON.stringify(pushed));
 
   if (okCount > 0) {
-    toast(`📲 已推送 ${okCount} 条 deadline 提醒到微信`, 'success');
+    toast(`→已推送 ${okCount} 条 deadline 提醒到微信`, 'success');
   }
 }
 
@@ -5417,7 +5999,7 @@ ${(extra || []).filter(Boolean).map(s => '- ' + s).join('\n')}
 }
 
 function promptUpgradeAccount() {
-  openModal('🚀 升级为正式账号', `
+  openModal('升级为正式账号', `
     <p style="color:var(--text-light);line-height:1.7;margin-bottom:16px">绑定邮箱后，你的数据会同步到云端，换设备登录也能看到。</p>
     <div class="form-group"><label>邮箱</label><input type="email" id="upgEmail" placeholder="your@email.com"></div>
     <div class="form-group"><label>密码（至少 8 位）</label><input type="password" id="upgPassword"></div>
@@ -5532,7 +6114,7 @@ pages.resumes = (main) => {
   main.innerHTML = `
     <div class="page-header">
       <div>
-        <div class="page-title">📄 简历库 <span style="font-size:13px;color:var(--text-light);font-weight:500">· ${list.length} 个版本</span></div>
+        <div class="page-title">简历库 <span style="font-size:13px;color:var(--text-light);font-weight:500">· ${list.length} 个版本</span></div>
         <div class="page-subtitle">为每个岗位定制简历 · 投递时一键选择对应版本</div>
       </div>
       <button class="btn btn-primary" onclick="openResumeUpload()" data-tip="支持 PDF/Word，单文件 ≤ 10MB">
@@ -5560,9 +6142,9 @@ pages.resumes = (main) => {
     <div class="card" style="margin-top:20px">
       <div class="card-title-bar"><h3><svg class="ic"><use href="#i-info"/></svg> 使用建议</h3></div>
       <div class="resume-tips">
-        <div class="resume-tip"><b>📌 多版本策略：</b>建议按方向准备 2-3 份核心简历（如「后端开发」「算法」「通用」），每份针对性突出不同项目</div>
-        <div class="resume-tip"><b>🎯 岗位适配：</b>投递时在求职台选择对应简历版本，方便后续追踪「哪一版的过笔率最高」</div>
-        <div class="resume-tip"><b>📊 数据追踪：</b>每份简历下方会显示用过次数，定期淘汰低效版本</div>
+        <div class="resume-tip"><b>//多版本策略：</b>建议按方向准备 2-3 份核心简历（如「后端开发」「算法」「通用」），每份针对性突出不同项目</div>
+        <div class="resume-tip"><b> 岗位适配：</b>投递时在求职台选择对应简历版本，方便后续追踪「哪一版的过笔率最高」</div>
+        <div class="resume-tip"><b>//数据追踪：</b>每份简历下方会显示用过次数，定期淘汰低效版本</div>
       </div>
     </div>
   `;
@@ -5580,7 +6162,7 @@ pages.resumes = (main) => {
 function renderResumeEmpty() {
   return `
     <div class="resume-empty">
-      <div class="resume-empty-emoji">📄</div>
+      <div class="resume-empty-emoji">[TXT]</div>
       <div class="resume-empty-title">还没有简历，先上传第一份吧</div>
       <div class="resume-empty-desc">建议至少准备 2-3 个版本针对不同方向投递</div>
       <button class="btn btn-primary" style="margin-top:16px" onclick="openResumeUpload()">
@@ -5592,7 +6174,7 @@ function renderResumeEmpty() {
 function renderResumeCard(r, usage) {
   const isPdf = /\.pdf$/i.test(r.fileName || '');
   const isDoc = /\.docx?$/i.test(r.fileName || '');
-  const icon = isPdf ? '📕' : isDoc ? '📘' : '📄';
+  const icon = isPdf ? '[PDF]' : isDoc ? '[DOC]' : '[TXT]';
   const targetColor = { '前端':'#3b82f6', '后端':'#10b981', '算法':'#a855f7', '产品':'#f59e0b', '运营':'#ec4899', '设计':'#8b5cf6', '通用':'#64748b' };
   const tcolor = targetColor[r.target] || '#6366f1';
   const updatedDate = r.updatedAt ? r.updatedAt.slice(0, 10) : (r.date || '未知');
@@ -5639,13 +6221,13 @@ function openResumeUpload(editingId) {
     <div class="resume-upload">
       ${!editing ? `
       <div class="resume-dropzone" id="resumeDropzone" onclick="document.getElementById('resumeFileInput').click()">
-        <div class="resume-dz-icon">📤</div>
+        <div class="resume-dz-icon"></div>
         <div class="resume-dz-title">点击选择文件，或拖放到此处</div>
         <div class="resume-dz-hint">支持 PDF / Word，最大 10MB</div>
         <input type="file" id="resumeFileInput" accept=".pdf,.doc,.docx" style="display:none" onchange="handleResumeFileSelect(event)">
       </div>
       <div class="resume-file-preview" id="resumeFilePreview" style="display:none">
-        <div class="resume-file-icon">📄</div>
+        <div class="resume-file-icon">[TXT]</div>
         <div class="resume-file-info">
           <div class="resume-file-name" id="resumeFileName">-</div>
           <div class="resume-file-size" id="resumeFileSize">-</div>
@@ -5669,7 +6251,7 @@ function openResumeUpload(editingId) {
       <!-- 技能自动提取（PDF 上传后填充） -->
       <div class="form-group" id="rsm_skills_wrap" style="${(editing?.skills?.length) ? '' : 'display:none'}">
         <label style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-          <span>🏷️ 检测到的技能</span>
+          <span>// 检测到的技能</span>
           <span id="rsm_skills_status" style="font-size:11px;color:var(--text-lighter);font-weight:400"></span>
         </label>
         <div id="rsm_skills_chips" class="rsm-skill-chips">${(editing?.skills||[]).map(s => renderSkillChip(s)).join('')}</div>
@@ -6106,7 +6688,7 @@ pages.opportunities = (main) => {
   main.innerHTML = `
     <div class="page-header">
       <div>
-        <div class="page-title">📥 公司库 <span style="font-size:13px;color:var(--text-light);font-weight:500">· ${all.length} 个机会</span></div>
+        <div class="page-title">公司库 <span style="font-size:13px;color:var(--text-light);font-weight:500">· ${all.length} 个机会</span></div>
         <div class="page-subtitle">汇聚各大公司秋招/春招/实习信息，未来由爬虫 + 用户共建</div>
       </div>
       <button class="btn btn-primary" onclick="openJDParser()" data-tip="把 JD 一键转成投递记录">
@@ -6430,14 +7012,14 @@ function renderQuickSuggest(q){
   const box = document.getElementById('quickSuggest');
   if (!q.trim()){
     box.innerHTML = `
-      <div class="quick-suggest-group">⚡ 快捷操作</div>
+      <div class="quick-suggest-group"> 快捷操作</div>
       <div class="quick-suggest-item active" onclick="qaAction('newApp')"><div class="si-icon" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)"><svg class="ic ic-sm" style="color:#fff"><use href="#i-send"/></svg></div><div class="si-main"><div class="si-title">新增投递</div><div class="si-sub">记录一次新投递</div></div><div class="si-action">Enter</div></div>
       <div class="quick-suggest-item" onclick="qaAction('newEvent')"><div class="si-icon" style="background:linear-gradient(135deg,#10b981,#34d399)"><svg class="ic ic-sm" style="color:#fff"><use href="#i-calendar"/></svg></div><div class="si-main"><div class="si-title">新增日程</div><div class="si-sub">面试/笔试/deadline</div></div></div>
       <div class="quick-suggest-item" onclick="qaAction('newJD')"><div class="si-icon" style="background:linear-gradient(135deg,#f59e0b,#fbbf24)"><svg class="ic ic-sm" style="color:#fff"><use href="#i-zap"/></svg></div><div class="si-main"><div class="si-title">粘贴 JD 智能解析</div><div class="si-sub">复制招聘信息一键入库</div></div></div>
       <div class="quick-suggest-item" onclick="qaAction('openOpp')"><div class="si-icon" style="background:linear-gradient(135deg,#a78bfa,#c4b5fd)"><svg class="ic ic-sm" style="color:#fff"><use href="#i-inbox"/></svg></div><div class="si-main"><div class="si-title">浏览公司库</div><div class="si-sub">查看本周新开机会</div></div></div>
       <div class="si-main"><div class="si-title">新增八股</div><div class="si-sub">记录知识点</div></div></div>
       <div class="si-main"><div class="si-title">新增刷题</div><div class="si-sub">记录一道题</div></div></div>
-      <div class="quick-suggest-group">💡 提示</div>
+      <div class="quick-suggest-group">//提示</div>
       <div style="padding:10px 14px;font-size:12px;color:var(--text-lighter)">输入关键词搜索全模块（公司、岗位、知识点、话术...）</div>`;
     return;
   }
@@ -6525,13 +7107,13 @@ function maybeStartOnboarding(force=false){
     prevBtnText: '← 上一步',
     doneBtnText: '完成 ✓',
     steps:[
-      { popover:{ title:'👋 欢迎使用 Offerly', description:'2026 / 2027 届毕业生专属求职管理平台。<br>10 秒带你看完所有核心功能。'} },
-      { element:'[data-nav="dashboard"]', popover:{ title:'⚡ 今日', description:'第一眼看到本周 deadline、今日面试、求职进度。<br>每天打开它就知道该做什么。' } },
-      { element:'[data-nav="jobs"]', popover:{ title:'🎯 求职台', description:'多维表格管理<b>投递记录</b>和<b>意向岗位</b>，支持列表/看板双视图。' } },
-      { element:'[data-nav="opp"]', popover:{ title:'📥 公司库', description:'汇聚字节、腾讯、阿里等大厂秋招/春招/实习机会，一键加入求职台。' } },
-      { element:'[data-nav="resumes"]', popover:{ title:'📄 简历库 <span style="font-size:10px;padding:2px 6px;background:linear-gradient(135deg,#6366f1,#ec4899);color:#fff;border-radius:6px">NEW</span>', description:'为不同方向准备<b>多版本简历</b>，投递时一键选择对应版本，追踪每份简历的过笔率。' } },
-      { element:'[data-nav="calendar"]', popover:{ title:'📅 日历', description:'面试、笔试、deadline 一目了然，自动从投递同步。' } },
-      { element:'#fab', popover:{ title:'⚡ 快速添加', description:'随时按 <kbd>Ctrl+K</kbd> 唤起，支持<b>粘贴 JD 智能解析</b>。' } }
+      { popover:{ title:'欢迎使用 Offerly', description:'2026 / 2027 届毕业生专属求职管理平台。<br>10 秒带你看完所有核心功能。'} },
+      { element:'[data-nav="dashboard"]', popover:{ title:'今日', description:'第一眼看到本周 deadline、今日面试、求职进度。<br>每天打开它就知道该做什么。' } },
+      { element:'[data-nav="jobs"]', popover:{ title:'求职台', description:'多维表格管理<b>投递记录</b>和<b>意向岗位</b>，支持列表/看板双视图。' } },
+      { element:'[data-nav="opp"]', popover:{ title:'公司库', description:'汇聚字节、腾讯、阿里等大厂秋招/春招/实习机会，一键加入求职台。' } },
+      { element:'[data-nav="resumes"]', popover:{ title:'简历库 <span style="font-size:10px;padding:2px 6px;background:#FF3D00;color:#fff;font-family:JetBrains Mono,monospace;letter-spacing:0.5px">NEW</span>', description:'为不同方向准备<b>多版本简历</b>，投递时一键选择对应版本，追踪每份简历的过笔率。' } },
+      { element:'[data-nav="calendar"]', popover:{ title:'日历', description:'面试、笔试、deadline 一目了然，自动从投递同步。' } },
+      { element:'#fab', popover:{ title:'快速添加', description:'随时按 <kbd>Ctrl+K</kbd> 唤起，支持<b>粘贴 JD 智能解析</b>。' } }
     ],
     onDestroyed: ()=>localStorage.setItem(ONBOARD_KEY,'1')
   });
@@ -6643,7 +7225,7 @@ document.addEventListener('mousemove', e => {
           nw.addEventListener('statechange', () => {
             if (nw.state === 'installed' && navigator.serviceWorker.controller) {
               if (typeof toast === 'function') {
-                toast('💡 检测到新版本，刷新后生效', 'info');
+                toast('//检测到新版本，刷新后生效', 'info');
               }
             }
           });
@@ -6674,7 +7256,7 @@ document.addEventListener('mousemove', e => {
     el.id = 'pwaInstallBanner';
     el.innerHTML = `
       <div class="pwa-banner-inner">
-        <div class="pwa-banner-icon">📲</div>
+        <div class="pwa-banner-icon">[APP]</div>
         <div class="pwa-banner-text">
           <div class="pwa-banner-title">把 Offerly 装进主屏幕</div>
           <div class="pwa-banner-sub">离线可开 · 启动飞快 · 像 App 一样用</div>
@@ -6694,7 +7276,7 @@ document.addEventListener('mousemove', e => {
       } else {
         // iOS Safari 走教学弹窗
         if (typeof openModal === 'function') {
-          openModal('📲 添加到主屏幕', `
+          openModal('→添加到主屏幕', `
             <p style="color:var(--text-light);line-height:1.7">iOS 用户请按以下步骤：</p>
             <ol style="color:var(--text);line-height:2;padding-left:20px">
               <li>点击底部 Safari 的 <b>分享按钮</b> <span style="font-size:18px">⬆️</span></li>
@@ -6729,7 +7311,7 @@ document.addEventListener('mousemove', e => {
   window.addEventListener('appinstalled', () => {
     console.log('[PWA] 已安装到主屏幕');
     document.getElementById('pwaInstallBanner')?.remove();
-    if (typeof toast === 'function') toast('🎉 Offerly 已添加到主屏幕', 'success');
+    if (typeof toast === 'function') toast('Offerly 已添加到主屏幕', 'success');
   });
 })();
 </script>
