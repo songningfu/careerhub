@@ -1084,6 +1084,29 @@ html.dark .auth-input { background: rgba(15,23,42,0.5); }
   border-radius: 4px; font-weight: 700;
 }
 
+/* 验证码"发送"按钮 */
+.auth-btn-send-code {
+  white-space: nowrap;
+  padding: 0 14px;
+  background: rgba(99,102,241,0.10);
+  color: var(--primary);
+  border: 1.5px solid rgba(99,102,241,0.25);
+  border-radius: 11px;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.auth-btn-send-code:hover:not(:disabled) {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.auth-btn-send-code:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .auth-bottom-text { text-align: center; margin-top: 18px; font-size: 13px; color: var(--text-light); }
 .auth-bottom-text a { color: var(--primary); font-weight: 600; cursor: pointer; }
 .auth-bottom-text a:hover { text-decoration: underline; }
@@ -2724,7 +2747,15 @@ html.dark .auth-overlay {
 
           <div class="auth-form-group">
             <label class="auth-label"><svg class="ic ic-sm"><use href="#i-mail"/></svg>邮箱</label>
-            <input type="email" id="regEmail" class="auth-input" placeholder="your@email.com">
+            <div style="display:flex;gap:8px;align-items:stretch">
+              <input type="email" id="regEmail" class="auth-input" placeholder="your@email.com" style="flex:1">
+              <button type="button" class="auth-btn-send-code" id="regSendCodeBtn" onclick="sendRegisterCode()">发送验证码</button>
+            </div>
+          </div>
+          <div class="auth-form-group" id="regCodeWrap" style="display:none">
+            <label class="auth-label"><svg class="ic ic-sm"><use href="#i-mail"/></svg>邮箱验证码</label>
+            <input type="text" id="regCode" class="auth-input" placeholder="邮箱里收到的 6 位数字" maxlength="6" inputmode="numeric" autocomplete="one-time-code">
+            <div style="font-size:11px;color:var(--text-lighter);margin-top:4px">没收到？检查垃圾邮件 / 间隔 60s 再发</div>
           </div>
           <div class="auth-form-group">
             <label class="auth-label"><svg class="ic ic-sm"><use href="#i-key"/></svg>密码</label>
@@ -2753,15 +2784,6 @@ html.dark .auth-overlay {
           </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
-    <div id="registerForm" style="display:none">
-      <div class="form-group"><label>邮箱</label><input type="email" id="regEmail" placeholder="your@email.com"></div>
-      <div class="form-group"><label>密码（至少 8 位）</label><input type="password" id="regPassword"></div>
-      <div class="form-group"><label>确认密码</label><input type="password" id="regPassword2"></div>
-      <button class="btn btn-primary" onclick="handleRegister()">注 册</button>
-      <div class="auth-switch">已有账号？<a onclick="showLogin()">返回登录</a></div>
     </div>
   </div>
 </div>
@@ -4190,7 +4212,15 @@ async function handleLogin(){
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return showAuthMsg('邮箱格式不正确', 'error');
   setLoginBtnLoading(true);
   try {
-    await auth.signInWithEmailAndPassword(e, p);
+    // CloudBase v2 SDK：用统一的 signIn 入口，传 username + password
+    // v1 兼容：保留 signInWithEmailAndPassword 兜底
+    if (typeof auth.signIn === 'function') {
+      await auth.signIn({ username: e, password: p });
+    } else if (typeof auth.signInWithEmailAndPassword === 'function') {
+      await auth.signInWithEmailAndPassword(e, p);
+    } else {
+      throw new Error('当前 SDK 版本不支持邮箱登录');
+    }
     currentUser = auth.currentUser;
     await enterApp();
   } catch(err) {
@@ -4198,13 +4228,105 @@ async function handleLogin(){
     setLoginBtnLoading(false);
   }
 }
+/* ========== 邮箱注册（v2 SDK 三步：发码 → 验证 → 注册）========== */
+// 当前发码拿到的 verification_id（用于第二步）
+let _regVerificationId = null;
+// 当前验证后拿到的 token（用于第三步）
+let _regVerificationToken = null;
+let _regCountdown = 0;
+
+async function sendRegisterCode(){
+  const e = val('regEmail');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return showAuthMsg('邮箱格式不正确','error');
+  const btn = document.getElementById('regSendCodeBtn');
+  if (_regCountdown > 0) return; // 倒计时中
+  btn.disabled = true;
+  btn.textContent = '发送中...';
+  try {
+    if (typeof auth.getVerification !== 'function') {
+      throw new Error('当前 SDK 不支持发送验证码');
+    }
+    // v2 SDK：getVerification({ email })  → { verification_id }
+    const res = await auth.getVerification({ email: e });
+    _regVerificationId = res?.verification_id || res?.verificationId;
+    if (!_regVerificationId) throw new Error('返回数据缺 verification_id');
+    document.getElementById('regCodeWrap').style.display = 'block';
+    showAuthMsg('✉️ 验证码已发送，60s 内有效，请到邮箱查收（含垃圾箱）','success');
+    document.getElementById('regCode')?.focus();
+    // 60s 倒计时
+    _regCountdown = 60;
+    const tick = () => {
+      if (_regCountdown <= 0) {
+        btn.disabled = false;
+        btn.textContent = '重新发送';
+        return;
+      }
+      btn.textContent = `${_regCountdown}s 后可重发`;
+      _regCountdown--;
+      setTimeout(tick, 1000);
+    };
+    tick();
+  } catch (err) {
+    console.error(err);
+    showAuthMsg('发送失败：' + (err.message || '请稍后再试'), 'error');
+    btn.disabled = false;
+    btn.textContent = '发送验证码';
+  }
+}
+
 async function handleRegister(){
-  const e=val('regEmail'), p=val('regPassword'), p2=val('regPassword2');
-  if (!e||!p) return showAuthMsg('请输入邮箱和密码','error');
-  if (p.length<8) return showAuthMsg('密码至少 8 位','error');
-  if (p!==p2) return showAuthMsg('两次密码不一致','error');
-  try { await auth.signUpWithEmailAndPassword(e,p); showAuthMsg('✅ 注册成功！请到邮箱验证后登录','success',false); setTimeout(showLogin,2000); }
-  catch(err){ showAuthMsg('注册失败：'+(err.message||'请稍后重试'),'error'); }
+  const e = val('regEmail'), code = val('regCode'), p = val('regPassword'), p2 = val('regPassword2');
+  if (!e || !p) return showAuthMsg('请输入邮箱和密码','error');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return showAuthMsg('邮箱格式不正确','error');
+  if (p.length < 8) return showAuthMsg('密码至少 8 位','error');
+  if (p !== p2) return showAuthMsg('两次密码不一致','error');
+  if (!_regVerificationId) return showAuthMsg('请先点「发送验证码」','warning');
+  if (!code || code.length < 4) return showAuthMsg('请输入邮箱里收到的验证码','warning');
+
+  try {
+    // 第 2 步：验证 code → 拿 verification_token
+    if (!_regVerificationToken) {
+      const v = await auth.verify({
+        verification_id: _regVerificationId,
+        verification_code: code.trim(),
+      });
+      _regVerificationToken = v?.verification_token || v?.verificationToken;
+      if (!_regVerificationToken) throw new Error('验证失败：未返回 token');
+    }
+
+    // 第 3 步：注册
+    if (typeof auth.signUp === 'function') {
+      await auth.signUp({
+        email: e,
+        password: p,
+        verification_token: _regVerificationToken,
+      });
+    } else if (typeof auth.signUpWithEmailAndPassword === 'function') {
+      // 1.x 老 SDK 兜底
+      await auth.signUpWithEmailAndPassword(e, p);
+    } else {
+      throw new Error('当前 SDK 版本不支持邮箱注册');
+    }
+
+    showAuthMsg('✅ 注册成功！正在跳转登录...','success',false);
+    // 重置缓冲
+    _regVerificationId = null;
+    _regVerificationToken = null;
+    setTimeout(()=>{
+      switchAuthTab('login');
+      // 自动填邮箱方便登录
+      const li = document.getElementById('loginEmail');
+      if (li) li.value = e;
+      document.getElementById('loginPassword')?.focus();
+    }, 1500);
+  } catch(err) {
+    console.error(err);
+    // 如果是验证码错误，清掉缓冲让用户重输
+    if (/verif|code|token/i.test(err.message || '')) {
+      _regVerificationToken = null;
+    }
+    showAuthMsg('注册失败：' + (err.message || '请稍后重试'), 'error');
+  }
 }
 async function handleAnonymousLogin(){
   try {
@@ -4216,7 +4338,10 @@ async function handleAnonymousLogin(){
     } else {
       throw new Error('当前 SDK 版本不支持匿名登录');
     }
-    currentUser = await getCurrentUser();
+    // 2.x SDK：登录成功后 auth.currentUser 同步可用
+    currentUser = auth.currentUser || (typeof auth.getLoginState === 'function'
+      ? (await auth.getLoginState())?.user
+      : null);
     if (!currentUser) throw new Error('获取用户信息失败');
     await enterApp();
   } catch (e) {
@@ -4228,9 +4353,14 @@ async function handleAnonymousLogin(){
 async function handleLogout(){
   if (MODE === 'cloud' && auth) {
     try {
-      await auth.signOut();
+      // v2 SDK: logout()；v1 兼容 signOut()
+      if (typeof auth.signOut === 'function') {
+        await auth.signOut();
+      } else if (typeof auth.logout === 'function') {
+        await auth.logout();
+      }
     } catch (e) {
-      console.warn('signOut failed:', e);
+      console.warn('logout failed:', e);
     }
   }
 
@@ -5303,15 +5433,17 @@ async function doUpgradeAccount() {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return toast('邮箱格式不正确', 'error');
   if (p.length < 8) return toast('密码至少 8 位', 'error');
   try {
-    // CloudBase 匿名账户升级：先注册新账号，然后让用户重新登录
-    // 完整的"匿名→实名"升级需要 SDK 支持 linkWithEmailAndPassword
-    if (typeof auth.signUpWithEmailAndPassword === 'function') {
+    // v2: signUp；v1 兼容：signUpWithEmailAndPassword
+    if (typeof auth.signUp === 'function') {
+      await auth.signUp({ email: e, password: p });
+    } else if (typeof auth.signUpWithEmailAndPassword === 'function') {
       await auth.signUpWithEmailAndPassword(e, p);
-      closeModal();
-      toast('✓ 账号已创建！请去邮箱验证，下次登录用新账号', 'success');
     } else {
       toast('当前 SDK 不支持账号升级，请退出后用邮箱重新注册', 'error');
+      return;
     }
+    closeModal();
+    toast('✓ 账号已创建！请去邮箱验证，下次登录用新账号', 'success');
   } catch (err) {
     toast('绑定失败：' + (err.message || '请重试'), 'error');
   }
@@ -6467,19 +6599,26 @@ document.addEventListener('mousemove', e => {
     ],
   };
   // 优先用同源真实文件 manifest.webmanifest（更兼容、能被 Add-to-HomeScreen 识别）
-  // 找不到则用 Blob URL 兜底（开发期 / 单文件演示）
+  // 但要校验内容真的是合法 JSON，因为 CloudBase 上传偶尔会传成 0 字节空文件
   const link = document.createElement('link');
   link.rel = 'manifest';
   link.href = './manifest.webmanifest';
   document.head.appendChild(link);
-  // 探测 manifest 是否存在，失败就换 Blob 兜底
-  fetch('./manifest.webmanifest', { method: 'HEAD' }).then(r => {
-    if (!r.ok) throw new Error('manifest not found');
-  }).catch(() => {
-    const manifestBlob = new Blob([JSON.stringify(manifest)], { type:'application/manifest+json' });
-    link.href = URL.createObjectURL(manifestBlob);
-    console.info('[PWA] 未找到 manifest.webmanifest，已切换到 inline 兜底');
-  });
+
+  // 探测：用 GET 真实拉一遍，验证 JSON 可解析
+  fetch('./manifest.webmanifest', { cache: 'no-store' })
+    .then(async r => {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const text = await r.text();
+      if (!text.trim()) throw new Error('manifest 文件为空（上传失败？）');
+      JSON.parse(text); // 验证 JSON 合法
+      // OK，继续用同源 URL
+    })
+    .catch(err => {
+      console.warn('[PWA] manifest 文件异常，启用 Blob 兜底：', err.message);
+      const manifestBlob = new Blob([JSON.stringify(manifest)], { type:'application/manifest+json' });
+      link.href = URL.createObjectURL(manifestBlob);
+    });
 
   // 2. 注册 Service Worker
   // 浏览器禁止用 blob:/data: URL 注册 SW，必须是同源真实文件。
