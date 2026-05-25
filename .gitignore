@@ -32,3 +32,11 @@ DRAFT_*
 
 # 日志
 *.log
+
+# 凭据 / 密钥（绝对禁止提交）
+.env
+.env.*
+*.env
+secrets.json
+*.key
+cloudbaserc.local.json

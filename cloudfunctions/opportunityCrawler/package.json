@@ -1,0 +1,13 @@
+{
+  "name": "opportunity-crawler",
+  "version": "0.1.0",
+  "description": "CareerHub opportunity crawler with DeepSeek enrichment",
+  "main": "index.js",
+  "engines": {
+    "node": ">=16"
+  },
+  "dependencies": {
+    "@cloudbase/node-sdk": "^3.5.0",
+    "axios": "^1.6.0"
+  }
+}

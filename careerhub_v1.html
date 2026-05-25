@@ -3038,6 +3038,101 @@ html.dark .resume-icon::before { color: var(--brut-bg); }
 /* 设置页 stats cards 通用 */
 .settings-stats { display: grid; gap: 14px; }
 .settings-stat { background: var(--brut-card) !important; border: 1.5px solid var(--brut-line) !important; border-radius: 0 !important; box-shadow: 4px 4px 0 var(--brut-line) !important; }
+
+/* ============================================================================
+   DEEPSEEK CRAWLER 进度面板
+   ============================================================================ */
+.opp-crawler-panel { margin: 12px 0 16px; }
+.opp-crawler-status {
+  background: var(--brut-card);
+  border: 2px solid var(--brut-line);
+  box-shadow: 6px 6px 0 var(--brut-accent);
+  padding: 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-family: var(--brut-mono);
+  position: relative;
+  overflow: hidden;
+}
+.opp-crawler-status.running {
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+}
+.opp-crawler-status.running::before {
+  content: '';
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: 3px; background: var(--brut-accent);
+  animation: opp-crawler-scan 1.4s cubic-bezier(0.6,0,0.4,1) infinite;
+  transform-origin: left;
+}
+@keyframes opp-crawler-scan {
+  0% { transform: scaleX(0); transform-origin: left; }
+  50% { transform: scaleX(1); transform-origin: left; }
+  50.01% { transform: scaleX(1); transform-origin: right; }
+  100% { transform: scaleX(0); transform-origin: right; }
+}
+.opp-crawler-status.warn { box-shadow: 6px 6px 0 var(--brut-fg-3); }
+.opp-crawler-status.error { box-shadow: 6px 6px 0 var(--brut-accent); border-color: var(--brut-accent); }
+.opp-crawler-status.ok { box-shadow: 6px 6px 0 var(--brut-fg); }
+
+.opp-crawler-spinner {
+  width: 32px; height: 32px;
+  border: 3px solid var(--brut-bg-2);
+  border-top-color: var(--brut-accent);
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+.opp-crawler-title {
+  font-family: var(--brut-display);
+  font-size: 16px;
+  letter-spacing: -0.3px;
+  text-transform: uppercase;
+  color: var(--brut-fg);
+}
+.opp-crawler-sub {
+  font-family: var(--brut-mono);
+  font-size: 11px;
+  color: var(--brut-fg-2);
+  letter-spacing: 0.4px;
+  margin-top: 4px;
+}
+.opp-crawler-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0;
+  border-top: 1.5px solid var(--brut-line);
+  margin-top: 8px;
+  padding-top: 12px;
+}
+.opp-crawler-cell {
+  padding: 6px 4px;
+  border-right: 1px dashed var(--brut-line);
+  text-align: left;
+}
+.opp-crawler-cell:last-child { border-right: none; }
+.opp-crawler-cell .num {
+  font-family: var(--brut-display);
+  font-size: 26px;
+  letter-spacing: -1px;
+  color: var(--brut-fg);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.opp-crawler-cell.accent .num { color: var(--brut-accent); }
+.opp-crawler-cell .lab {
+  font-family: var(--brut-mono);
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  color: var(--brut-fg-3);
+  margin-top: 4px;
+  text-transform: uppercase;
+}
+@media (max-width: 720px) {
+  .opp-crawler-grid { grid-template-columns: repeat(3, 1fr); }
+  .opp-crawler-cell:nth-child(3) { border-right: none; }
+}
 </style>
 
 <!-- Brutalist behavior: hero 字符切片翻入 -->
@@ -6691,10 +6786,17 @@ pages.opportunities = (main) => {
         <div class="page-title">公司库 <span style="font-size:13px;color:var(--text-light);font-weight:500">· ${all.length} 个机会</span></div>
         <div class="page-subtitle">汇聚各大公司秋招/春招/实习信息，未来由爬虫 + 用户共建</div>
       </div>
-      <button class="btn btn-primary" onclick="openJDParser()" data-tip="把 JD 一键转成投递记录">
-        <svg class="ic ic-sm"><use href="#i-zap"/></svg>粘贴 JD 添加
-      </button>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-secondary" id="oppCrawlerBtn" onclick="triggerOpportunityCrawler()" data-tip="DeepSeek 抓取最新校招机会">
+          <svg class="ic ic-sm"><use href="#i-zap"/></svg><span id="oppCrawlerBtnLabel">立即更新</span>
+        </button>
+        <button class="btn btn-primary" onclick="openJDParser()" data-tip="把 JD 一键转成投递记录">
+          <svg class="ic ic-sm"><use href="#i-zap"/></svg>粘贴 JD 添加
+        </button>
+      </div>
     </div>
+
+    <div id="oppCrawlerPanel" class="opp-crawler-panel" style="display:none"></div>
 
     <div class="opp-toolbar">
       <div class="opp-search">
@@ -6896,6 +6998,111 @@ async function parseJDWithLLM(text) {
     console.warn('[JD API] 调用失败，回退本地解析:', e.message);
     toast('网络调用失败，已回退本地解析', 'warning');
     return parseJDLocally(text);
+  }
+}
+
+/* ============================================================
+   公司库 · DeepSeek 爬虫触发
+============================================================ */
+let _crawlerRunning = false;
+async function triggerOpportunityCrawler() {
+  if (_crawlerRunning) { toast('正在更新中，稍候', 'info'); return; }
+  if (!app || !app.callFunction) {
+    toast('云端未初始化，无法触发更新', 'error');
+    return;
+  }
+  _crawlerRunning = true;
+  const btn = document.getElementById('oppCrawlerBtn');
+  const label = document.getElementById('oppCrawlerBtnLabel');
+  const panel = document.getElementById('oppCrawlerPanel');
+  if (btn) btn.disabled = true;
+  if (label) label.textContent = '更新中...';
+  if (panel) {
+    panel.style.display = 'block';
+    panel.innerHTML = `
+      <div class="opp-crawler-status running">
+        <div class="opp-crawler-spinner"></div>
+        <div class="opp-crawler-text">
+          <div class="opp-crawler-title">DEEPSEEK CRAWLING</div>
+          <div class="opp-crawler-sub">正在从 GitHub 招聘合集抓取 → DeepSeek 结构化 → 写入公司库</div>
+        </div>
+      </div>`;
+  }
+
+  let result;
+  try {
+    const res = await app.callFunction({
+      name: 'opportunityCrawler',
+      data: { action: 'run', trigger: 'manual' }
+    });
+    result = res && res.result;
+  } catch (e) {
+    if (panel) {
+      panel.innerHTML = `<div class="opp-crawler-status error">
+        <div class="opp-crawler-title">CALL FAILED</div>
+        <div class="opp-crawler-sub">${escHtml(e.message || String(e))}</div>
+      </div>`;
+    }
+    toast('调用云函数失败：' + (e.message || ''), 'error');
+    _crawlerRunning = false;
+    if (btn) btn.disabled = false;
+    if (label) label.textContent = '立即更新';
+    return;
+  }
+
+  _crawlerRunning = false;
+  if (btn) btn.disabled = false;
+  if (label) label.textContent = '立即更新';
+
+  if (!result) {
+    if (panel) panel.innerHTML = `<div class="opp-crawler-status error"><div class="opp-crawler-title">EMPTY RESULT</div></div>`;
+    toast('云函数无返回，请到控制台看日志', 'error');
+    return;
+  }
+
+  if (result.code === 'RATE_LIMITED') {
+    if (panel) panel.innerHTML = `<div class="opp-crawler-status warn">
+      <div class="opp-crawler-title">RATE LIMITED</div>
+      <div class="opp-crawler-sub">${escHtml(result.message || '')} · 已用 ${result.used}/${result.limit}</div>
+    </div>`;
+    toast(result.message || '已达到今日上限', 'info');
+    return;
+  }
+
+  if (!result.ok) {
+    if (panel) panel.innerHTML = `<div class="opp-crawler-status error">
+      <div class="opp-crawler-title">RUN FAILED</div>
+      <div class="opp-crawler-sub">${escHtml(result.error || '未知错误')}</div>
+    </div>`;
+    toast('更新失败：' + (result.error || ''), 'error');
+    return;
+  }
+
+  const p = result.phases || {};
+  const d = result.db || {};
+  if (panel) {
+    panel.innerHTML = `
+      <div class="opp-crawler-status ok">
+        <div class="opp-crawler-title">UPDATE COMPLETE · ${Math.round((result.durationMs || 0) / 1000)}s</div>
+        <div class="opp-crawler-grid">
+          <div class="opp-crawler-cell"><div class="num">${p.fetched || 0}</div><div class="lab">FETCHED</div></div>
+          <div class="opp-crawler-cell accent"><div class="num">${d.inserted || 0}</div><div class="lab">NEW</div></div>
+          <div class="opp-crawler-cell"><div class="num">${d.updated || 0}</div><div class="lab">UPDATED</div></div>
+          <div class="opp-crawler-cell"><div class="num">${d.markedExpired || 0}</div><div class="lab">EXPIRED</div></div>
+          <div class="opp-crawler-cell"><div class="num">${p.llmCalls || 0}</div><div class="lab">LLM CALLS</div></div>
+          <div class="opp-crawler-cell"><div class="num">${(p.llmTokens || 0).toLocaleString()}</div><div class="lab">TOKENS</div></div>
+        </div>
+      </div>`;
+  }
+  toast(`已更新：新增 ${d.inserted || 0} · 刷新 ${d.updated || 0}`, 'success');
+
+  // 重新加载 opportunities 数据再渲染
+  try {
+    const fresh = await db.collection('opportunities').where({ expired: false }).limit(200).get();
+    DB.opportunities = (fresh.data || []).map((r) => ({ ...r }));
+    renderPage('opportunities');
+  } catch (e) {
+    console.warn('[crawler] reload opportunities failed', e);
   }
 }
 

@@ -1,0 +1,121 @@
+name: 部署 CloudBase 云函数 (opportunityCrawler)
+
+# ============================================================
+# 触发条件：
+#   - push 改了 cloudfunctions/opportunityCrawler/** 任意文件
+#   - 手动触发
+# 工作流：
+#   1. 安装 @cloudbase/cli
+#   2. tcb login
+#   3. tcb fn:deploy opportunityCrawler --force
+#   4. 注入 DEEPSEEK_API_KEY 环境变量
+# ============================================================
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'cloudfunctions/opportunityCrawler/**'
+      - '.github/workflows/deploy-function.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-fn-opportunityCrawler
+  cancel-in-progress: true
+
+jobs:
+  deploy-function:
+    name: 部署 opportunityCrawler 云函数
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 装 Node 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: 安装云函数依赖
+        working-directory: cloudfunctions/opportunityCrawler
+        run: npm install --omit=dev
+
+      - name: 安装 CloudBase CLI
+        run: npm install -g @cloudbase/cli@latest
+
+      - name: 校验必要 secrets
+        run: |
+          missing=""
+          [ -z "${{ secrets.TCB_SECRET_ID }}" ]  && missing="$missing TCB_SECRET_ID"
+          [ -z "${{ secrets.TCB_SECRET_KEY }}" ] && missing="$missing TCB_SECRET_KEY"
+          [ -z "${{ secrets.TCB_ENV_ID }}" ]    && missing="$missing TCB_ENV_ID"
+          [ -z "${{ secrets.DEEPSEEK_API_KEY }}" ] && missing="$missing DEEPSEEK_API_KEY"
+          if [ -n "$missing" ]; then
+            echo "::error::缺少 secrets:$missing"
+            echo "请在 GitHub repo Settings → Secrets and variables → Actions 添加"
+            exit 1
+          fi
+          echo "✓ 4 个 secrets 都在"
+
+      - name: 登录 CloudBase
+        env:
+          TCB_SECRET_ID:  ${{ secrets.TCB_SECRET_ID }}
+          TCB_SECRET_KEY: ${{ secrets.TCB_SECRET_KEY }}
+        run: |
+          tcb login --apiKeyId "$TCB_SECRET_ID" --apiKey "$TCB_SECRET_KEY"
+
+      - name: 生成 cloudbaserc（确保 envId 注入）
+        env:
+          TCB_ENV_ID: ${{ secrets.TCB_ENV_ID }}
+        run: |
+          cat > cloudbaserc.json << EOF
+          {
+            "version": "2.0",
+            "envId": "$TCB_ENV_ID",
+            "functionRoot": "./cloudfunctions",
+            "functions": [
+              {
+                "name": "opportunityCrawler",
+                "timeout": 60,
+                "memorySize": 256,
+                "runtime": "Nodejs16.13",
+                "handler": "index.main",
+                "installDependency": true,
+                "envVariables": {
+                  "DEEPSEEK_API_KEY": "$DEEPSEEK_API_KEY_PLACEHOLDER",
+                  "DEEPSEEK_MODEL":   "$DEEPSEEK_MODEL_VAL"
+                }
+              }
+            ]
+          }
+          EOF
+          # 用 sed 注入真实值（避免 shell 转义把 sk- 截断）
+          sed -i "s|\$DEEPSEEK_API_KEY_PLACEHOLDER|${{ secrets.DEEPSEEK_API_KEY }}|" cloudbaserc.json
+          sed -i "s|\$DEEPSEEK_MODEL_VAL|${{ vars.DEEPSEEK_MODEL || 'deepseek-chat' }}|" cloudbaserc.json
+          echo "=== cloudbaserc.json (脱敏)"
+          sed 's/sk-[A-Za-z0-9]\{8,\}/sk-***REDACTED***/' cloudbaserc.json
+
+      - name: 部署云函数
+        env:
+          TCB_ENV_ID: ${{ secrets.TCB_ENV_ID }}
+        run: |
+          tcb fn deploy opportunityCrawler --force -e "$TCB_ENV_ID"
+
+      - name: 健康检查
+        env:
+          TCB_ENV_ID: ${{ secrets.TCB_ENV_ID }}
+        continue-on-error: true
+        run: |
+          echo '{"action":"ping"}' > /tmp/ping.json
+          tcb fn invoke opportunityCrawler --params /tmp/ping.json -e "$TCB_ENV_ID" || echo "ping failed (非阻断)"
+
+      - name: 部署摘要
+        run: |
+          echo "### 🛰️ opportunityCrawler 已部署" >> $GITHUB_STEP_SUMMARY
+          echo "- 时间：$(date -u +'%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "- 提交：${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**下一步：**" >> $GITHUB_STEP_SUMMARY
+          echo "- 前端公司库点「立即更新」即可触发" >> $GITHUB_STEP_SUMMARY
+          echo "- 控制台 → 云函数 → opportunityCrawler → 触发器 可加定时器" >> $GITHUB_STEP_SUMMARY
