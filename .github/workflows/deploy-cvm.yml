@@ -1,0 +1,45 @@
+name: 部署到腾讯云 CVM
+
+# ============================================================
+# 触发：push main 分支（排除文档和爬虫）
+# 流程：GitHub Actions → SSH → git pull → Nginx 自动生效
+# ============================================================
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'backend/crawler/**'
+      - 'docs/**'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-cvm-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: SSH 部署到 CVM
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: SSH 进服务器拉最新代码
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host:     ${{ secrets.CVM_HOST }}
+          username: ${{ secrets.CVM_USER }}
+          key:      ${{ secrets.CVM_SSH_KEY }}
+          script: |
+            set -e
+            cd /var/www/careerhub
+            git pull origin main
+            echo "✓ 部署完成：$(date '+%Y-%m-%d %H:%M:%S')"
+
+      - name: 输出部署摘要
+        run: |
+          echo "### 🚀 已部署到 CVM" >> $GITHUB_STEP_SUMMARY
+          echo "- 服务器：\`${{ secrets.CVM_HOST }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- 时间：$(date -u +'%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "- 提交：${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- 访问：http://${{ secrets.CVM_HOST }}:8080" >> $GITHUB_STEP_SUMMARY

@@ -3133,6 +3133,58 @@ html.dark .resume-icon::before { color: var(--brut-bg); }
   .opp-crawler-grid { grid-template-columns: repeat(3, 1fr); }
   .opp-crawler-cell:nth-child(3) { border-right: none; }
 }
+
+/* ============ AI 助手页 ============ */
+.ai-layout { display: grid; grid-template-columns: 1fr 360px; gap: 20px; height: calc(100vh - 160px); min-height: 500px; }
+@media (max-width: 960px) { .ai-layout { grid-template-columns: 1fr; } }
+.ai-chat-panel { display: flex; flex-direction: column; background: var(--card); border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); overflow: hidden; }
+.ai-chat-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.ai-chat-header-icon { width: 36px; height: 36px; background: linear-gradient(135deg,#6366f1,#ec4899); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
+.ai-chat-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.ai-msg { display: flex; gap: 10px; animation: msgIn 0.25s var(--ease-out); }
+.ai-msg.user { flex-direction: row-reverse; }
+@keyframes msgIn { from { opacity:0; transform: translateY(8px); } to { opacity:1; transform: translateY(0); } }
+.ai-msg-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+.ai-msg.bot .ai-msg-avatar { background: linear-gradient(135deg,#6366f1,#818cf8); color: #fff; }
+.ai-msg.user .ai-msg-avatar { background: linear-gradient(135deg,#ec4899,#f43f5e); color: #fff; }
+.ai-msg-bubble { max-width: 78%; padding: 10px 14px; border-radius: 14px; font-size: 13.5px; line-height: 1.6; }
+.ai-msg.bot .ai-msg-bubble { background: var(--bg-2); color: var(--text); border-bottom-left-radius: 4px; }
+.ai-msg.user .ai-msg-bubble { background: linear-gradient(135deg,#6366f1,#818cf8); color: #fff; border-bottom-right-radius: 4px; }
+.ai-msg-bubble pre { white-space: pre-wrap; font-family: var(--font-mono, monospace); font-size: 12px; background: rgba(0,0,0,0.06); padding: 8px; border-radius: 6px; margin: 6px 0; }
+html.dark .ai-msg-bubble pre { background: rgba(255,255,255,0.08); }
+.ai-msg-bubble strong { font-weight: 700; }
+.ai-typing-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--primary); animation: typingBounce 1.2s ease-in-out infinite; }
+.ai-typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.ai-typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingBounce { 0%,60%,100% { transform: translateY(0); opacity:0.5; } 30% { transform: translateY(-6px); opacity:1; } }
+.ai-chat-footer { padding: 12px 16px; border-top: 1px solid var(--border); flex-shrink: 0; }
+.ai-quick-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.ai-chip { padding: 5px 11px; border-radius: 20px; background: rgba(99,102,241,0.1); color: var(--primary); font-size: 12px; cursor: pointer; border: 1px solid rgba(99,102,241,0.2); transition: all 0.2s; white-space: nowrap; }
+.ai-chip:hover { background: rgba(99,102,241,0.2); }
+.ai-input-row { display: flex; gap: 8px; align-items: flex-end; }
+.ai-input { flex: 1; resize: none; border: 1.5px solid var(--border); border-radius: 12px; padding: 10px 14px; font-size: 13.5px; font-family: inherit; color: var(--text); background: var(--bg); outline: none; max-height: 120px; min-height: 42px; transition: border-color 0.2s; line-height: 1.5; }
+.ai-input:focus { border-color: var(--primary); }
+html.dark .ai-input { background: var(--bg-2); }
+.ai-send-btn { width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg,#6366f1,#818cf8); border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform 0.2s, opacity 0.2s; }
+.ai-send-btn:hover { transform: scale(1.08); }
+.ai-send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.ai-side-panel { display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
+.ai-jd-import { background: var(--card); border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); padding: 18px; }
+.ai-jd-import h3 { font-size: 14px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+.ai-jd-textarea { width: 100%; height: 140px; resize: vertical; border: 1.5px solid var(--border); border-radius: 10px; padding: 10px; font-size: 12.5px; font-family: inherit; color: var(--text); background: var(--bg); outline: none; transition: border-color 0.2s; line-height: 1.5; }
+.ai-jd-textarea:focus { border-color: var(--primary); }
+html.dark .ai-jd-textarea { background: var(--bg-2); }
+.ai-parsed-preview { margin-top: 12px; padding: 12px; background: var(--bg-2); border-radius: 10px; font-size: 12.5px; line-height: 1.7; border: 1px solid var(--border); }
+.ai-parsed-row { display: flex; gap: 6px; margin-bottom: 3px; }
+.ai-parsed-label { color: var(--text-lighter); flex-shrink: 0; min-width: 48px; }
+.ai-context-card { background: var(--card); border-radius: 16px; box-shadow: var(--shadow); border: 1px solid var(--border); padding: 18px; }
+.ai-context-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+.ai-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ai-stat-item { background: var(--bg-2); border-radius: 8px; padding: 10px; text-align: center; }
+.ai-stat-num { font-size: 22px; font-weight: 800; color: var(--primary); }
+.ai-stat-label { font-size: 11px; color: var(--text-lighter); margin-top: 2px; }
+.ai-key-banner { background: rgba(99,102,241,0.08); border: 1px dashed rgba(99,102,241,0.3); border-radius: 10px; padding: 12px 14px; font-size: 12.5px; color: var(--text-light); display: flex; gap: 10px; align-items: flex-start; }
+.ai-key-banner a { color: var(--primary); cursor: pointer; text-decoration: underline; }
 </style>
 
 <!-- Brutalist behavior: hero 字符切片翻入 -->
@@ -3257,6 +3309,8 @@ html.dark .resume-icon::before { color: var(--brut-bg); }
     <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></symbol>
     <symbol id="i-type" viewBox="0 0 24 24"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></symbol>
     <symbol id="i-align-left" viewBox="0 0 24 24"><line x1="17" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="17" y1="18" x2="3" y2="18"/></symbol>
+    <symbol id="i-bot" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/><circle cx="8" cy="16" r="1" fill="currentColor"/><circle cx="16" cy="16" r="1" fill="currentColor"/></symbol>
+    <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></symbol>
     <symbol id="i-hash" viewBox="0 0 24 24"><line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/></symbol>
     <symbol id="i-circle-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="currentColor"/></symbol>
     <symbol id="i-tags" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></symbol>
@@ -3477,6 +3531,7 @@ html.dark .resume-icon::before { color: var(--brut-bg); }
       <div class="nav-item" data-page="opportunities" data-nav="opp"><svg class="ic"><use href="#i-inbox"/></svg><span>公司库</span></div>
       <div class="nav-item" data-page="resumes" data-nav="resumes"><svg class="ic"><use href="#i-file"/></svg><span>简历库</span><span class="nav-badge">NEW</span></div>
       <div class="nav-item" data-page="calendar" data-nav="calendar"><svg class="ic"><use href="#i-calendar"/></svg><span>日历</span></div>
+      <div class="nav-item" data-page="ai" data-nav="ai"><svg class="ic"><use href="#i-bot"/></svg><span>AI 助手</span><span class="nav-badge" style="background:linear-gradient(135deg,#6366f1,#ec4899)">AI</span></div>
       <div class="nav-item" data-page="settings" data-nav="settings"><svg class="ic"><use href="#i-settings"/></svg><span>设置</span></div>
     </div>
     <div class="nav-user">
@@ -5761,6 +5816,24 @@ pages.settings = (main) => {
         <button class="btn btn-primary" onclick="saveSettings()"><svg class="ic ic-sm"><use href="#i-check"/></svg>保存修改</button>
       </div>
 
+      <!-- AI 助手配置 -->
+      <div class="card">
+        <div class="card-title-bar"><h3><svg class="ic"><use href="#i-bot"/></svg> AI 助手配置</h3></div>
+        <div class="form-group">
+          <label>DeepSeek API Key <small style="color:var(--text-lighter);font-weight:400">（本地存储，不上传）</small></label>
+          <input id="s_aikey" type="password" value="${escHtml(localStorage.getItem('offerly_ai_key')||'')}" placeholder="sk-xxxxxxxxxxxxxxxx">
+          <small style="color:var(--text-lighter);font-size:11px">在 <a href="https://platform.deepseek.com" target="_blank" style="color:var(--primary)">platform.deepseek.com</a> 免费获取 · 也支持 OpenAI 兼容 Key</small>
+        </div>
+        <div class="form-group">
+          <label>AI 模型</label>
+          <select id="s_aimodel">
+            <option value="deepseek-chat" ${(localStorage.getItem('offerly_ai_model')||'deepseek-chat')==='deepseek-chat'?'selected':''}>DeepSeek Chat（推荐·最便宜）</option>
+            <option value="deepseek-reasoner" ${localStorage.getItem('offerly_ai_model')==='deepseek-reasoner'?'selected':''}>DeepSeek Reasoner（深度推理）</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="saveAISettings()"><svg class="ic ic-sm"><use href="#i-check"/></svg>保存 AI 配置</button>
+      </div>
+
       <!-- 账户信息 -->
       <div class="card">
         <div class="card-title-bar"><h3><svg class="ic"><use href="#i-key"/></svg> 账户与登录</h3></div>
@@ -6129,6 +6202,14 @@ async function saveSettings(){
   DB.settings.name = val('s_name')||'我';
   DB.settings.graduation = val('s_grad');
   await persistSettings(); updateUserUI(); toast('已保存');
+}
+function saveAISettings(){
+  const k = document.getElementById('s_aikey')?.value?.trim();
+  const m = document.getElementById('s_aimodel')?.value;
+  if (k) localStorage.setItem('offerly_ai_key', k);
+  else localStorage.removeItem('offerly_ai_key');
+  if (m) localStorage.setItem('offerly_ai_model', m);
+  toast('AI 配置已保存');
 }
 function exportData(){
   const blob = new Blob([JSON.stringify(DB,null,2)], {type:'application/json'});
@@ -6999,6 +7080,373 @@ async function parseJDWithLLM(text) {
     toast('网络调用失败，已回退本地解析', 'warning');
     return parseJDLocally(text);
   }
+}
+
+/* ============================================================
+   AI 助手页
+============================================================ */
+const AI_CHAT_HISTORY = [];  // session 内保持对话记忆
+
+function retrieveRelevantJDs(query, jds, topK = 10) {
+  if (!jds.length) return [];
+  const tokens = query.toLowerCase().split(/[\s,，。、！？\n]+/).filter(t => t.length > 1);
+  return jds
+    .map(jd => {
+      const text = [jd.position, jd.company, jd.desc, jd.city, jd.salary,
+        ...(jd.tags || []), ...(jd.requirements || [])].join(' ').toLowerCase();
+      let score = 0;
+      tokens.forEach(t => { if (text.includes(t)) score += (t.length > 3 ? 2 : 1); });
+      return { jd, score };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, topK)
+    .map(x => x.jd);
+}
+
+function buildAISystemPrompt(resumeText) {
+  const jds = DB.opportunities || [];
+  const jdSummary = jds.slice(0, 60).map((j, i) =>
+    `${i+1}. [${j.company}] ${j.position} | ${j.city||''} | ${j.salary||''} | 截止:${j.deadline||'未知'}\n   标签:${(j.tags||[]).join('/')} | ${j.desc||''}`
+  ).join('\n');
+
+  return `你是 Offerly 的专业求职助手 AI。帮助用户分析岗位匹配度、技能差距，提供求职策略建议。
+
+【用户简历摘要】
+${resumeText || '（用户暂未提供简历，请引导用户上传简历）'}
+
+【JD 知识库（共 ${jds.length} 条岗位）】
+${jdSummary || '（暂无岗位数据）'}
+
+【回答要求】
+- 匹配分析：列出最匹配的 3-5 个岗位并说明理由
+- 技能差距：具体指出缺失技能，并给出提升建议
+- 语言：中文，简洁专业，适当使用 emoji 增加可读性
+- 如岗位库为空，先建议用户去"公司库"页面添加岗位`;
+}
+
+async function aiSendMessage(userMsg) {
+  const apiKey = localStorage.getItem('offerly_ai_key');
+  if (!apiKey) {
+    return '请先在【设置】页面配置 DeepSeek API Key，才能使用 AI 功能。\n\n获取地址：https://platform.deepseek.com（注册即送免费额度）';
+  }
+
+  const resume = (DB.resumes || []).find(r => r.isDefault) || (DB.resumes || [])[0];
+  const resumeText = resume
+    ? `姓名：${resume.name||''}，目标岗位：${resume.targetPosition||resume.target||''}，技能：${(resume.skills||[]).join('、')}，教育：${resume.education||''}，经历摘要：${resume.summary||resume.experience||''}`
+    : '';
+
+  const relevantJDs = retrieveRelevantJDs(userMsg, DB.opportunities || []);
+  const contextJDs = relevantJDs.length
+    ? '\n\n【与问题最相关的岗位】\n' + relevantJDs.map((j,i) =>
+        `${i+1}. ${j.company} · ${j.position}（${j.city||''}）薪资:${j.salary||'?'} 截止:${j.deadline||'?'}\n   要求:${(j.requirements||[]).slice(0,3).join('；')}`
+      ).join('\n')
+    : '';
+
+  const messages = [
+    ...AI_CHAT_HISTORY.slice(-8),
+    { role: 'user', content: userMsg + contextJDs }
+  ];
+
+  const model = localStorage.getItem('offerly_ai_model') || 'deepseek-chat';
+  const res = await fetch('https://api.deepseek.com/v1/chat/completions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+    body: JSON.stringify({
+      model,
+      messages: [{ role: 'system', content: buildAISystemPrompt(resumeText) }, ...messages],
+      temperature: 0.7,
+      max_tokens: 1500,
+      stream: false,
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`API ${res.status}: ${err.slice(0,200)}`);
+  }
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content || '（空响应）';
+}
+
+function renderAIChatMsg(role, content) {
+  const msgs = document.getElementById('aiMessages');
+  if (!msgs) return;
+  const div = document.createElement('div');
+  div.className = `ai-msg ${role}`;
+  const avatar = role === 'bot' ? '🤖' : '你';
+  // simple markdown: **bold**, `code`, newlines
+  const html = content
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/`([^`]+)`/g,'<code style="background:rgba(0,0,0,0.08);padding:1px 4px;border-radius:4px">$1</code>')
+    .replace(/\n/g,'<br>');
+  div.innerHTML = `
+    <div class="ai-msg-avatar">${avatar}</div>
+    <div class="ai-msg-bubble">${html}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function renderAITyping() {
+  const msgs = document.getElementById('aiMessages');
+  if (!msgs) return null;
+  const div = document.createElement('div');
+  div.className = 'ai-msg bot'; div.id = 'aiTyping';
+  div.innerHTML = `<div class="ai-msg-avatar">🤖</div>
+    <div class="ai-msg-bubble" style="padding:12px 16px">
+      <span class="ai-typing-dot"></span>
+      <span class="ai-typing-dot"></span>
+      <span class="ai-typing-dot"></span>
+    </div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+async function aiHandleSend() {
+  const inp = document.getElementById('aiInput');
+  const btn = document.getElementById('aiSendBtn');
+  const msg = inp?.value?.trim();
+  if (!msg) return;
+  inp.value = ''; inp.style.height = '42px';
+  if (btn) btn.disabled = true;
+
+  renderAIChatMsg('user', msg);
+  AI_CHAT_HISTORY.push({ role: 'user', content: msg });
+
+  const typing = renderAITyping();
+  try {
+    const reply = await aiSendMessage(msg);
+    typing?.remove();
+    renderAIChatMsg('bot', reply);
+    AI_CHAT_HISTORY.push({ role: 'assistant', content: reply });
+  } catch (e) {
+    typing?.remove();
+    renderAIChatMsg('bot', `出错了：${e.message}\n\n请检查 API Key 是否正确，或稍后重试。`);
+  } finally {
+    if (btn) btn.disabled = false;
+    inp?.focus();
+  }
+}
+
+async function aiParseJD() {
+  const ta = document.getElementById('aiJDInput');
+  const raw = ta?.value?.trim();
+  if (!raw || raw.length < 30) { toast('请粘贴完整的 JD 内容（至少30字）', 'error'); return; }
+
+  const parseBtn = document.getElementById('aiParseBtn');
+  if (parseBtn) { parseBtn.disabled = true; parseBtn.textContent = '解析中...'; }
+
+  try {
+    // try local LLM parse first via deepseek direct
+    const apiKey = localStorage.getItem('offerly_ai_key');
+    let parsed;
+    if (apiKey) {
+      const res = await fetch('https://api.deepseek.com/v1/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          model: 'deepseek-chat',
+          messages: [
+            { role: 'system', content: `提取JD关键信息，必须返回严格JSON，无任何解释：{"company":"公司名","position":"岗位名","city":"城市","deadline":"YYYY-MM-DD或空","salary":"薪资","requirements":["要求1","要求2"],"tags":["标签"]}` },
+            { role: 'user', content: raw }
+          ],
+          temperature: 0.1, max_tokens: 600, response_format: { type: 'json_object' }
+        })
+      });
+      const d = await res.json();
+      const txt = d.choices?.[0]?.message?.content || '{}';
+      parsed = JSON.parse(txt.replace(/^```(?:json)?\s*/i,'').replace(/```\s*$/,'').trim());
+    } else {
+      // fallback: regex heuristic
+      const lines = raw.split('\n').filter(Boolean);
+      parsed = { company: '', position: lines[0]?.slice(0,30) || '', city: '', deadline: '', salary: '', requirements: [], tags: [] };
+    }
+
+    // show preview
+    const preview = document.getElementById('aiJDPreview');
+    if (preview) {
+      preview.style.display = 'block';
+      preview.innerHTML = `
+        <div style="font-weight:700;margin-bottom:8px;color:var(--primary)">解析结果预览</div>
+        <div class="ai-parsed-row"><span class="ai-parsed-label">公司</span><span>${escHtml(parsed.company||'—')}</span></div>
+        <div class="ai-parsed-row"><span class="ai-parsed-label">岗位</span><span>${escHtml(parsed.position||'—')}</span></div>
+        <div class="ai-parsed-row"><span class="ai-parsed-label">城市</span><span>${escHtml(parsed.city||'—')}</span></div>
+        <div class="ai-parsed-row"><span class="ai-parsed-label">薪资</span><span>${escHtml(parsed.salary||'—')}</span></div>
+        <div class="ai-parsed-row"><span class="ai-parsed-label">截止</span><span>${escHtml(parsed.deadline||'—')}</span></div>
+        <div class="ai-parsed-row"><span class="ai-parsed-label">要求</span><span>${(parsed.requirements||[]).map(r=>`<span class="tag tag-blue">${escHtml(r)}</span>`).join(' ')}</span></div>
+        <div class="ai-parsed-row"><span class="ai-parsed-label">标签</span><span>${(parsed.tags||[]).map(t=>`<span class="tag">${escHtml(t)}</span>`).join(' ')}</span></div>
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button class="btn btn-primary btn-sm" onclick="aiSaveJD()">
+            <svg class="ic ic-sm"><use href="#i-plus"/></svg>保存到公司库
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="document.getElementById('aiJDPreview').style.display='none';document.getElementById('aiJDInput').value=''">清空</button>
+        </div>`;
+    }
+    window._aiParsedJD = parsed;
+  } catch (e) {
+    toast('解析失败：' + e.message, 'error');
+  } finally {
+    if (parseBtn) { parseBtn.disabled = false; parseBtn.textContent = '智能解析'; }
+  }
+}
+
+async function aiSaveJD() {
+  const parsed = window._aiParsedJD;
+  if (!parsed) return;
+  const opp = {
+    id: 'op_' + Math.random().toString(36).slice(2,10),
+    company: parsed.company || '未知公司',
+    position: parsed.position || '未知岗位',
+    city: parsed.city || '',
+    salary: parsed.salary || '',
+    deadline: parsed.deadline || '',
+    industry: '',
+    tags: parsed.tags || [],
+    requirements: parsed.requirements || [],
+    source: '手动导入',
+    sourceUrl: '',
+    desc: (parsed.requirements||[]).join('；'),
+    createdAt: new Date().toISOString(),
+  };
+  await addItem('opportunities', opp);
+  toast(`已保存：${opp.company} · ${opp.position}`, 'success');
+  document.getElementById('aiJDPreview').style.display = 'none';
+  document.getElementById('aiJDInput').value = '';
+  // refresh context stats
+  const el = document.getElementById('aiJDCount');
+  if (el) el.textContent = (DB.opportunities||[]).length;
+}
+
+pages.ai = (main) => {
+  const jdCount = (DB.opportunities||[]).length;
+  const resumeCount = (DB.resumes||[]).length;
+  const hasKey = !!localStorage.getItem('offerly_ai_key');
+
+  main.innerHTML = `
+    <div class="page-header">
+      <div>
+        <div class="page-title">✨ AI 求职助手</div>
+        <div class="page-subtitle">基于你的 JD 知识库 · 智能匹配 · 技能分析 · 面试准备</div>
+      </div>
+    </div>
+
+    ${!hasKey ? `<div class="ai-key-banner" style="margin-bottom:16px">
+      <svg class="ic" style="flex-shrink:0;color:var(--primary)"><use href="#i-bot"/></svg>
+      <div>AI 功能需要 DeepSeek API Key。请前往 <a onclick="document.querySelector('.nav-item[data-page=settings]').click()">设置页面</a> 配置（免费注册即获额度，约 ¥0.001/次）。</div>
+    </div>` : ''}
+
+    <div class="ai-layout">
+      <!-- 左：对话区 -->
+      <div class="ai-chat-panel">
+        <div class="ai-chat-header">
+          <div class="ai-chat-header-icon"><svg class="ic"><use href="#i-bot"/></svg></div>
+          <div>
+            <div style="font-weight:700;font-size:14px">Offerly AI</div>
+            <div style="font-size:12px;color:var(--text-lighter)">JD 库 <b id="aiJDCount" style="color:var(--primary)">${jdCount}</b> 条 · 简历 <b style="color:var(--primary)">${resumeCount}</b> 份</div>
+          </div>
+          <button class="btn btn-secondary btn-sm" style="margin-left:auto" onclick="AI_CHAT_HISTORY.length=0;renderPage('ai')">清空对话</button>
+        </div>
+
+        <div class="ai-chat-messages" id="aiMessages">
+          ${AI_CHAT_HISTORY.length === 0 ? `
+          <div class="ai-msg bot">
+            <div class="ai-msg-avatar">🤖</div>
+            <div class="ai-msg-bubble">
+              你好！我是 Offerly AI 助手 👋<br><br>
+              我可以帮你：<br>
+              🎯 <strong>岗位匹配</strong>：分析哪些 JD 最适合你<br>
+              📊 <strong>技能差距</strong>：找出你还缺哪些技能<br>
+              ✉️ <strong>投递策略</strong>：定制求职邮件 / 自我介绍<br>
+              💡 <strong>面试准备</strong>：针对 JD 生成高频面试题<br><br>
+              ${jdCount === 0 ? '⚠️ 你的 JD 库还是空的，建议先去右侧「导入 JD」或「公司库」添加岗位。<br><br>' : ''}
+              ${resumeCount === 0 ? '⚠️ 还没有简历，去「简历库」上传后分析会更准确。<br><br>' : ''}
+              有什么想问的？直接说吧！
+            </div>
+          </div>` : AI_CHAT_HISTORY.map(m => {
+            const role = m.role === 'user' ? 'user' : 'bot';
+            const avatar = role === 'bot' ? '🤖' : '你';
+            const html = escHtml(m.content).replace(/\n/g,'<br>');
+            return `<div class="ai-msg ${role}"><div class="ai-msg-avatar">${avatar}</div><div class="ai-msg-bubble">${html}</div></div>`;
+          }).join('')}
+        </div>
+
+        <div class="ai-chat-footer">
+          <div class="ai-quick-chips">
+            <div class="ai-chip" onclick="aiQuickSend('哪些岗位最匹配我的简历？列出 Top 5 并说明理由')">🎯 岗位匹配</div>
+            <div class="ai-chip" onclick="aiQuickSend('对比我的简历和 JD 要求，我还缺哪些技能？怎么补？')">📊 技能差距</div>
+            <div class="ai-chip" onclick="aiQuickSend('帮我针对最匹配的岗位写一段 100 字以内的自我介绍')">✉️ 自我介绍</div>
+            <div class="ai-chip" onclick="aiQuickSend('针对最匹配的 JD 出 5 道高频面试题并给出思路')">💡 面试题</div>
+          </div>
+          <div class="ai-input-row">
+            <textarea class="ai-input" id="aiInput" rows="1" placeholder="问我任何求职问题…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiHandleSend()}" oninput="this.style.height='42px';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+            <button class="ai-send-btn" id="aiSendBtn" onclick="aiHandleSend()">
+              <svg class="ic"><use href="#i-send"/></svg>
+            </button>
+          </div>
+          <div style="font-size:11px;color:var(--text-lighter);margin-top:6px;text-align:center">Enter 发送 · Shift+Enter 换行 · 数据仅在本地处理</div>
+        </div>
+      </div>
+
+      <!-- 右：导入 JD + 状态 -->
+      <div class="ai-side-panel">
+
+        <!-- JD 导入 -->
+        <div class="ai-jd-import">
+          <h3><svg class="ic ic-sm"><use href="#i-upload"/></svg> 导入新 JD</h3>
+          <p style="font-size:12px;color:var(--text-lighter);margin-bottom:10px">粘贴招聘 JD 全文，AI 自动解析关键字段并入库</p>
+          <textarea class="ai-jd-textarea" id="aiJDInput" placeholder="粘贴 JD 原文到这里（招聘公告、Boss直聘、官网 JD 均可）…"></textarea>
+          <button class="btn btn-primary" id="aiParseBtn" onclick="aiParseJD()" style="width:100%;margin-top:10px">
+            <svg class="ic ic-sm"><use href="#i-sparkle"/></svg> 智能解析
+          </button>
+          <div id="aiJDPreview" class="ai-parsed-preview" style="display:none"></div>
+        </div>
+
+        <!-- 知识库状态 -->
+        <div class="ai-context-card">
+          <h3><svg class="ic ic-sm"><use href="#i-database"/></svg> 知识库状态</h3>
+          <div class="ai-stat-grid">
+            <div class="ai-stat-item">
+              <div class="ai-stat-num">${jdCount}</div>
+              <div class="ai-stat-label">已收录 JD</div>
+            </div>
+            <div class="ai-stat-item">
+              <div class="ai-stat-num">${resumeCount}</div>
+              <div class="ai-stat-label">简历档案</div>
+            </div>
+            <div class="ai-stat-item">
+              <div class="ai-stat-num">${(DB.applications||[]).length}</div>
+              <div class="ai-stat-label">投递记录</div>
+            </div>
+            <div class="ai-stat-item">
+              <div class="ai-stat-num">${(DB.applications||[]).filter(a=>a.status==='Offer').length}</div>
+              <div class="ai-stat-label">Offer 数</div>
+            </div>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-secondary btn-sm" onclick="document.querySelector('.nav-item[data-page=opportunities]').click()">
+              <svg class="ic ic-sm"><use href="#i-inbox"/></svg> 公司库
+            </button>
+            <button class="btn btn-secondary btn-sm" onclick="document.querySelector('.nav-item[data-page=resumes]').click()">
+              <svg class="ic ic-sm"><use href="#i-file"/></svg> 简历库
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>`;
+
+  // scroll to bottom if resuming conversation
+  requestAnimationFrame(() => {
+    const msgs = document.getElementById('aiMessages');
+    if (msgs) msgs.scrollTop = msgs.scrollHeight;
+  });
+};
+
+function aiQuickSend(text) {
+  const inp = document.getElementById('aiInput');
+  if (inp) { inp.value = text; inp.style.height = '42px'; inp.style.height = Math.min(inp.scrollHeight, 120) + 'px'; }
+  aiHandleSend();
 }
 
 /* ============================================================
