@@ -18,10 +18,9 @@
 
 <!-- 核心库 -->
 <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
-<!-- CloudBase SDK：官方推荐 CDN（2.x 系列，匿名登录要求 SDK ≥ 2.0）
-     来源：https://docs.cloudbase.net/api-reference/webv2/initialization -->
-<script src="https://static.cloudbase.net/cloudbase-js-sdk/2.9.6/cloudbase.full.js"></script>
-<script>window.cloudbase || document.write('<script src="https://imgcache.qq.com/qcloud/cloudbase-js-sdk/1.4.0/cloudbase.full.js"><\/script>');</script>
+<!-- PocketBase SDK：自托管后端（部署在腾讯云 CVM）
+     文档：https://github.com/pocketbase/js-sdk -->
+<script src="https://cdn.jsdelivr.net/npm/pocketbase@0.21.5/dist/pocketbase.umd.js"></script>
 
 <!-- 增强库 -->
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
@@ -3478,15 +3477,7 @@ html.dark .ai-jd-textarea { background: var(--bg-2); }
 
           <div class="auth-form-group">
             <label class="auth-label"><svg class="ic ic-sm"><use href="#i-mail"/></svg>邮箱</label>
-            <div style="display:flex;gap:8px;align-items:stretch">
-              <input type="email" id="regEmail" class="auth-input" placeholder="your@email.com" style="flex:1">
-              <button type="button" class="auth-btn-send-code" id="regSendCodeBtn" onclick="sendRegisterCode()">发送验证码</button>
-            </div>
-          </div>
-          <div class="auth-form-group" id="regCodeWrap" style="display:none">
-            <label class="auth-label"><svg class="ic ic-sm"><use href="#i-mail"/></svg>邮箱验证码</label>
-            <input type="text" id="regCode" class="auth-input" placeholder="邮箱里收到的 6 位数字" maxlength="6" inputmode="numeric" autocomplete="one-time-code">
-            <div style="font-size:11px;color:var(--text-lighter);margin-top:4px">没收到？检查垃圾邮件 / 间隔 60s 再发</div>
+            <input type="email" id="regEmail" class="auth-input" placeholder="your@email.com">
           </div>
           <div class="auth-form-group">
             <label class="auth-label"><svg class="ic ic-sm"><use href="#i-key"/></svg>密码</label>
@@ -3674,16 +3665,16 @@ const ENV_KEY = 'careerhub_env_id';
 const MODE_KEY = 'careerhub_mode';
 
 // ============================================================
-// CloudBase 配置 - 部署时改这里！
-// 在腾讯云控制台 console.cloud.tencent.com/tcb 创建环境后填入环境 ID
+// PocketBase 配置 - 部署时改这里！
+// 自托管在腾讯云 CVM，通过 Nginx 反代到本机 8090 端口
+// 同源路径 /pb 避免跨域和混合内容问题
 // ============================================================
-const CLOUDBASE_ENV_ID = window.CLOUDBASE_ENV_ID || 'jesu-6gwqz60k00cb92a2';
+const PB_URL = window.PB_URL || (location.origin + '/pb');
 const THEME_KEY = 'careerhub_theme';
 const ONBOARD_KEY = 'careerhub_onboarded';
-let ENV_ID = localStorage.getItem(ENV_KEY) || '';
 let MODE = localStorage.getItem(MODE_KEY) || '';
-let app=null, auth=null, db=null;
-let currentUser=null;
+let pb = null;            // PocketBase 客户端实例
+let currentUser = null;
 let DB=null;
 let currentCalendarDate=new Date();
 let globalFuse = null;
@@ -3901,23 +3892,20 @@ async function uploadAttachment(file){
     });
     return { name:file.name, size:file.size, url:base64, type:file.type, storedAt:'local' };
   } else {
-    if (file.size > MAX_CLOUD_FILE) throw new Error('云端单文件最大 20MB');
-    if (!app) throw new Error('云端未初始化');
-    const cloudPath = `attachments/${Date.now()}_${file.name}`;
-    const res = await app.uploadFile({ cloudPath, filePath:file });
-    return { name:file.name, size:file.size, url:res.fileID, type:file.type, storedAt:'cloud', fileID:res.fileID };
+    // 云端模式（PocketBase）：附件转 base64 存入记录 payload，限 5MB
+    if (file.size > 5 * 1024 * 1024) throw new Error('单文件最大 5MB');
+    const base64 = await new Promise((resolve,reject)=>{
+      const r = new FileReader();
+      r.onload = ()=>resolve(r.result);
+      r.onerror = reject;
+      r.readAsDataURL(file);
+    });
+    return { name:file.name, size:file.size, url:base64, type:file.type, storedAt:'local' };
   }
 }
 async function getAttachmentUrl(att){
   if (!att) return '';
-  if (att.storedAt === 'local') return att.url;
-  if (att.storedAt === 'cloud' && app){
-    try {
-      const r = await app.getTempFileURL({ fileList:[att.fileID || att.url] });
-      return r.fileList[0]?.tempFileURL || '';
-    } catch(e){ return ''; }
-  }
-  return att.url || '';
+  return att.url || '';   // 统一 base64 data URL
 }
 async function openAttachment(att){
   const url = await getAttachmentUrl(att);
@@ -4602,9 +4590,10 @@ async function syncBitableChange(collection, action, payload, newData){
       await saveLocal();
     } else {
       try {
-        const tasks = DB[collection].map(r =>
-          db.collection(collection).doc(r.id).update({ order: r.order })
-        );
+        const tasks = DB[collection].map(r => {
+          const full = {...r}; delete full.id;
+          return pb.collection(collection).update(r.id, { payload: full });
+        });
         await Promise.all(tasks);
       } catch (e) {
         console.warn('reorder cloud sync failed:', e);
@@ -4626,9 +4615,9 @@ async function syncBitableChange(collection, action, payload, newData){
     } else {
       try {
         record.createdAt = Date.now();
-        record.owner = currentUser.uid;
-        const res = await db.collection(collection).add(record);
-        record.id = res.id || res._id || (res.insertedId);
+        const payloadObj = {...record}; delete payloadObj.id;
+        const rec = await pb.collection(collection).create({ owner: currentUser.id, payload: payloadObj });
+        record.id = rec.id;
         DB[collection].push(record);
       } catch (e) {
         toast('云端新增失败：' + e.message, 'error');
@@ -4650,10 +4639,8 @@ async function syncBitableChange(collection, action, payload, newData){
       await saveLocal();
     } else {
       try {
-        const toUpdate = { ...payload };
-        delete toUpdate.id;
-        delete toUpdate._id;
-        await db.collection(collection).doc(payload.id).update(toUpdate);
+        const full = {...updated}; delete full.id;
+        await pb.collection(collection).update(payload.id, { payload: full });
       } catch (e) {
         toast('云端更新失败：' + e.message, 'error');
         throw e;
@@ -4669,7 +4656,7 @@ async function syncBitableChange(collection, action, payload, newData){
       await saveLocal();
     } else {
       try {
-        await db.collection(collection).doc(payload.id).remove();
+        await pb.collection(collection).delete(payload.id);
       } catch (e) {
         toast('云端删除失败：' + e.message, 'error');
         throw e;
@@ -4917,205 +4904,117 @@ function initAuthCinematicFX(){
 })();
 
 function bootstrap(){
-  // V1：硬编码 CloudBase 环境 ID，直接走云端登录流程
-  // 部署到生产时把 CLOUDBASE_ENV_ID 改成你自己的环境 ID
-  if (!ENV_ID) ENV_ID = CLOUDBASE_ENV_ID;
-  MODE = 'cloud';
   try {
-    initCloudBase();
-    tryAutoLogin();
+    initPocketBase();
   } catch(e) {
-    console.error('CloudBase 初始化失败', e);
-    hideLoading();
-    document.getElementById('authOverlay').style.display = 'flex';
-    showAuthMsg('云端服务连接失败，请检查环境 ID 配置', 'error', false);
+    console.error('PocketBase 初始化失败', e);
   }
+  tryAutoLogin();
 }
 async function tryAutoLogin(){
   showLoading();
-  try { const s = await auth.getLoginState(); if (s){ currentUser = auth.currentUser; await enterApp(); return; } } catch(e){}
+  // 本地（游客）模式：直接读 localStorage
+  if (MODE === 'local'){
+    try { await enterApp(); return; } catch(e){ console.error(e); }
+  }
+  // 云端模式：PocketBase 持久化了登录态就自动进入
+  try {
+    if (pb && pb.authStore.isValid){
+      // 刷新一下 token，确认仍有效
+      await pb.collection('users').authRefresh();
+      currentUser = pb.authStore.model;
+      MODE = 'cloud';
+      await enterApp();
+      return;
+    }
+  } catch(e){ console.warn('自动登录失效，需要重新登录', e); pb?.authStore.clear(); }
   hideLoading();
   document.getElementById('authOverlay').style.display='flex';
 }
-function initCloudBase(){ app = cloudbase.init({env:ENV_ID, timeout:120000}); auth = app.auth({persistence:'local'}); db = app.database(); }
+function initPocketBase(){
+  pb = new PocketBase(PB_URL);
+  pb.autoCancellation(false);  // 避免并发请求被自动取消
+}
 async function handleLogin(){
   const e = val('loginEmail'), p = val('loginPassword');
   if (!e || !p) return showAuthMsg('请输入邮箱和密码', 'error');
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return showAuthMsg('邮箱格式不正确', 'error');
   setLoginBtnLoading(true);
   try {
-    // CloudBase v2 SDK：用统一的 signIn 入口，传 username + password
-    // v1 兼容：保留 signInWithEmailAndPassword 兜底
-    if (typeof auth.signIn === 'function') {
-      await auth.signIn({ username: e, password: p });
-    } else if (typeof auth.signInWithEmailAndPassword === 'function') {
-      await auth.signInWithEmailAndPassword(e, p);
-    } else {
-      throw new Error('当前 SDK 版本不支持邮箱登录');
-    }
-    currentUser = auth.currentUser;
+    if (!pb) initPocketBase();
+    await pb.collection('users').authWithPassword(e, p);
+    currentUser = pb.authStore.model;
+    MODE = 'cloud';
+    localStorage.setItem(MODE_KEY, 'cloud');
     await enterApp();
   } catch(err) {
-    showAuthMsg('登录失败：' + (err.message || '请检查邮箱密码'), 'error');
+    const msg = err?.status === 400 ? '邮箱或密码错误' : (err.message || '请检查邮箱密码');
+    showAuthMsg('登录失败：' + msg, 'error');
     setLoginBtnLoading(false);
   }
 }
-/* ========== 邮箱注册（v2 SDK 三步：发码 → 验证 → 注册）========== */
-// 当前发码拿到的 verification_id（用于第二步）
-let _regVerificationId = null;
-// 当前验证后拿到的 token（用于第三步）
-let _regVerificationToken = null;
-let _regCountdown = 0;
-
-async function sendRegisterCode(){
-  const e = val('regEmail');
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return showAuthMsg('邮箱格式不正确','error');
-  const btn = document.getElementById('regSendCodeBtn');
-  if (_regCountdown > 0) return; // 倒计时中
-  btn.disabled = true;
-  btn.textContent = '发送中...';
-  try {
-    if (typeof auth.getVerification !== 'function') {
-      throw new Error('当前 SDK 不支持发送验证码');
-    }
-    // v2 SDK：getVerification({ email })  → { verification_id }
-    const res = await auth.getVerification({ email: e });
-    _regVerificationId = res?.verification_id || res?.verificationId;
-    if (!_regVerificationId) throw new Error('返回数据缺 verification_id');
-    document.getElementById('regCodeWrap').style.display = 'block';
-    showAuthMsg('MAIL:验证码已发送，60s 内有效，请到邮箱查收（含垃圾箱）','success');
-    document.getElementById('regCode')?.focus();
-    // 60s 倒计时
-    _regCountdown = 60;
-    const tick = () => {
-      if (_regCountdown <= 0) {
-        btn.disabled = false;
-        btn.textContent = '重新发送';
-        return;
-      }
-      btn.textContent = `${_regCountdown}s 后可重发`;
-      _regCountdown--;
-      setTimeout(tick, 1000);
-    };
-    tick();
-  } catch (err) {
-    console.error(err);
-    showAuthMsg('发送失败：' + (err.message || '请稍后再试'), 'error');
-    btn.disabled = false;
-    btn.textContent = '发送验证码';
-  }
+/* ========== 邮箱注册（PocketBase 直接注册，无需邮箱验证码）========== */
+// 兼容旧的「发送验证码」按钮：PocketBase 不需要验证码，点击即提示
+function sendRegisterCode(){
+  showAuthMsg('无需验证码，填好密码直接点「创建账号」即可','info');
 }
 
 async function handleRegister(){
-  const e = val('regEmail'), code = val('regCode'), p = val('regPassword'), p2 = val('regPassword2');
+  const e = val('regEmail'), p = val('regPassword'), p2 = val('regPassword2');
   if (!e || !p) return showAuthMsg('请输入邮箱和密码','error');
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return showAuthMsg('邮箱格式不正确','error');
   if (p.length < 8) return showAuthMsg('密码至少 8 位','error');
   if (p !== p2) return showAuthMsg('两次密码不一致','error');
-  if (!_regVerificationId) return showAuthMsg('请先点「发送验证码」','warning');
-  if (!code || code.length < 4) return showAuthMsg('请输入邮箱里收到的验证码','warning');
 
+  const btn = document.getElementById('registerBtn');
+  if (btn) btn.disabled = true;
   try {
-    // 第 2 步：验证 code → 拿 verification_token
-    if (!_regVerificationToken) {
-      const v = await auth.verify({
-        verification_id: _regVerificationId,
-        verification_code: code.trim(),
-      });
-      _regVerificationToken = v?.verification_token || v?.verificationToken;
-      if (!_regVerificationToken) throw new Error('验证失败：未返回 token');
-    }
-
-    // 第 3 步：注册
-    if (typeof auth.signUp === 'function') {
-      await auth.signUp({
-        email: e,
-        password: p,
-        verification_token: _regVerificationToken,
-      });
-    } else if (typeof auth.signUpWithEmailAndPassword === 'function') {
-      // 1.x 老 SDK 兜底
-      await auth.signUpWithEmailAndPassword(e, p);
-    } else {
-      throw new Error('当前 SDK 版本不支持邮箱注册');
-    }
-
-    showAuthMsg('✓注册成功！正在跳转登录...','success',false);
-    // 重置缓冲
-    _regVerificationId = null;
-    _regVerificationToken = null;
-    setTimeout(()=>{
-      switchAuthTab('login');
-      // 自动填邮箱方便登录
-      const li = document.getElementById('loginEmail');
-      if (li) li.value = e;
-      document.getElementById('loginPassword')?.focus();
-    }, 1500);
+    if (!pb) initPocketBase();
+    // 创建用户
+    await pb.collection('users').create({
+      email: e,
+      password: p,
+      passwordConfirm: p2,
+    });
+    // 创建后直接登录
+    await pb.collection('users').authWithPassword(e, p);
+    currentUser = pb.authStore.model;
+    MODE = 'cloud';
+    localStorage.setItem(MODE_KEY, 'cloud');
+    showAuthMsg('✓注册成功！正在进入...','success',false);
+    setTimeout(()=> enterApp(), 600);
   } catch(err) {
     console.error(err);
-    // 如果是验证码错误，清掉缓冲让用户重输
-    if (/verif|code|token/i.test(err.message || '')) {
-      _regVerificationToken = null;
-    }
-    showAuthMsg('注册失败：' + (err.message || '请稍后重试'), 'error');
+    let msg = err?.message || '请稍后重试';
+    // PocketBase 校验错误细化提示
+    const data = err?.data?.data;
+    if (data?.email) msg = '邮箱：' + data.email.message;
+    else if (data?.password) msg = '密码：' + data.password.message;
+    showAuthMsg('注册失败：' + msg, 'error');
+    if (btn) btn.disabled = false;
   }
 }
+// 游客模式 = 本地模式（数据存浏览器 localStorage，不上云）
 async function handleAnonymousLogin(){
   try {
-    showLoading('正在以游客身份登录...');
-    if (typeof auth.signInAnonymously === 'function') {
-      await auth.signInAnonymously();
-    } else if (typeof auth.anonymousAuthProvider === 'function') {
-      await auth.anonymousAuthProvider().signIn();
-    } else {
-      throw new Error('当前 SDK 版本不支持匿名登录');
-    }
-    // 2.x SDK：登录成功后 auth.currentUser 同步可用
-    currentUser = auth.currentUser || (typeof auth.getLoginState === 'function'
-      ? (await auth.getLoginState())?.user
-      : null);
-    if (!currentUser) throw new Error('获取用户信息失败');
+    showLoading('正在以游客身份进入...');
+    MODE = 'local';
+    localStorage.setItem(MODE_KEY, 'local');
+    currentUser = { id: 'local', email: '', isAnonymous: true };
     await enterApp();
   } catch (e) {
-    console.error('Anonymous login error:', e);
-    toast('匿名登录失败：' + (e.message || '未知错误'), 'error');
+    console.error('Guest mode error:', e);
+    toast('进入失败：' + (e.message || '未知错误'), 'error');
     hideLoading();
   }
 }
 async function handleLogout(){
-  if (MODE === 'cloud' && auth) {
-    try {
-      // v2 SDK: logout()；v1 兼容 signOut()
-      if (typeof auth.signOut === 'function') {
-        await auth.signOut();
-      } else if (typeof auth.logout === 'function') {
-        await auth.logout();
-      }
-    } catch (e) {
-      console.warn('logout failed:', e);
-    }
+  if (MODE === 'cloud' && pb) {
+    try { pb.authStore.clear(); } catch (e) { console.warn('logout failed:', e); }
   }
-
-  currentUser = null;
-  DB = null;
-  globalFuse = null;
-
-  if (window._btInstance && typeof window._btInstance.destroy === 'function') {
-    window._btInstance.destroy();
-    window._btInstance = null;
-  }
-
-  const appRoot = document.getElementById('appRoot');
-  const authOverlay = document.getElementById('authOverlay');
-  if (appRoot) appRoot.style.display = 'none';
-  if (authOverlay) authOverlay.style.display = 'flex';
-
-  ['authEmail', 'authPassword'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
-  });
-
-  toast('已退出登录', 'info');
+  localStorage.removeItem(MODE_KEY);
+  // 刷新页面回到登录界面，状态最干净（本地模式数据仍保留在 localStorage）
+  location.reload();
 }
 function showAuthMsg(m,t,auto=true){ const el=document.getElementById('authMsg'); el.textContent=m; el.className='auth-msg '+t+' show'; if (auto) setTimeout(()=>el.classList.remove('show'),5000); }
 function showLogin(){ document.getElementById('loginForm').style.display='block'; document.getElementById('registerForm').style.display='none'; }
@@ -5146,19 +5045,75 @@ function saveLocal(){
     throw e;
   }
 }
+// PocketBase 数据模型：每个集合的记录 = { id, owner(text), payload(json), created, updated }
+// 前端把 payload 摊平成业务对象：{ id, ...payload }
+const PB_COLLECTIONS = ['applications','interviews','jobs','companies','resumes','skills','leetcode','journal','events','speeches','opportunities'];
+
+function pbFlatten(rec){ return { id: rec.id, ...(rec.payload || {}) }; }
+
 async function loadAllData(){
-  const names = ['applications','interviews','jobs','companies','resumes','skills','leetcode','journal','events','speeches'];
   DB = { settings:{name:'我',graduation:''} };
-  for (const n of names){
-    try { const r = await db.collection(n).limit(1000).get(); DB[n] = r.data.map(d=>{ const i={...d}; i.id=d._id; delete i._id; delete i._openid; return i; }); }
-    catch(e){ console.error(n,e); DB[n]=[]; }
+
+  // 本地（游客）模式：直接读 localStorage
+  if (MODE === 'local'){
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw){ DB = JSON.parse(raw); }
+    } catch(e){ console.error('读取本地数据失败', e); }
+    PB_COLLECTIONS.forEach(n => { if (!Array.isArray(DB[n])) DB[n] = []; });
+    if (!DB.settings) DB.settings = {name:'我',graduation:''};
+    return;
   }
-  try { const r = await db.collection('settings').limit(1).get(); if (r.data.length){ DB.settings = {...r.data[0]}; DB.settings.id = r.data[0]._id; delete DB.settings._id; delete DB.settings._openid; } } catch(e){}
+
+  // 云端模式：从 PocketBase 拉取（按 owner 过滤由 API 规则自动完成）
+  const uidStr = currentUser?.id;
+  for (const n of PB_COLLECTIONS){
+    try {
+      const list = await pb.collection(n).getFullList({ sort:'created' });
+      DB[n] = list.map(pbFlatten);
+    } catch(e){ console.error('load', n, e); DB[n] = []; }
+  }
+  // settings：每用户一条
+  try {
+    const r = await pb.collection('settings').getList(1, 1);
+    if (r.items.length){ DB.settings = { id:r.items[0].id, ...(r.items[0].payload||{}) }; }
+  } catch(e){ console.warn('load settings', e); }
 }
-async function addItem(col, data){ if (!data.id) data.id=uid(); if (MODE==='local'){ DB[col].push(data); saveLocal(); buildSearchIndex(); return data.id; } const c = {...data}; delete c.id; delete c._id; delete c._openid; const r = await db.collection(col).add(c); data.id = r.id||r.insertedId||r._id; DB[col].push(data); buildSearchIndex(); return data.id; }
-async function updateItem(col, id, data){ const i = DB[col].findIndex(x=>x.id===id); if (i>=0) DB[col][i] = data; if (MODE==='local'){ saveLocal(); buildSearchIndex(); return; } const c = {...data}; delete c.id; delete c._id; delete c._openid; await db.collection(col).doc(id).update(c); buildSearchIndex(); }
-async function deleteItem(col, id){ DB[col] = DB[col].filter(x=>x.id!==id); if (MODE==='local'){ saveLocal(); buildSearchIndex(); return; } await db.collection(col).doc(id).remove(); buildSearchIndex(); }
-async function persistSettings(){ if (MODE==='local'){ saveLocal(); return; } if (DB.settings.id) await db.collection('settings').doc(DB.settings.id).update({name:DB.settings.name,graduation:DB.settings.graduation}); else { const c={name:DB.settings.name,graduation:DB.settings.graduation}; const r = await db.collection('settings').add(c); DB.settings.id = r.id||r._id; } }
+
+async function addItem(col, data){
+  if (!data.id) data.id = uid();
+  if (MODE === 'local'){ DB[col].push(data); saveLocal(); buildSearchIndex(); return data.id; }
+  const payload = {...data}; delete payload.id;
+  const rec = await pb.collection(col).create({ owner: currentUser.id, payload });
+  data.id = rec.id;                 // 用 PocketBase 生成的 id 覆盖
+  DB[col].push(data); buildSearchIndex(); return data.id;
+}
+
+async function updateItem(col, id, data){
+  const i = DB[col].findIndex(x=>x.id===id); if (i>=0) DB[col][i] = data;
+  if (MODE === 'local'){ saveLocal(); buildSearchIndex(); return; }
+  const payload = {...data}; delete payload.id;
+  await pb.collection(col).update(id, { payload });
+  buildSearchIndex();
+}
+
+async function deleteItem(col, id){
+  DB[col] = DB[col].filter(x=>x.id!==id);
+  if (MODE === 'local'){ saveLocal(); buildSearchIndex(); return; }
+  await pb.collection(col).delete(id);
+  buildSearchIndex();
+}
+
+async function persistSettings(){
+  if (MODE === 'local'){ saveLocal(); return; }
+  const payload = { name: DB.settings.name, graduation: DB.settings.graduation, tracks: DB.settings.tracks };
+  if (DB.settings.id){
+    await pb.collection('settings').update(DB.settings.id, { payload });
+  } else {
+    const rec = await pb.collection('settings').create({ owner: currentUser.id, payload });
+    DB.settings.id = rec.id;
+  }
+}
 
 async function enterApp(){
   showLoading('正在加载你的数据...');
@@ -5178,11 +5133,8 @@ async function enterApp(){
 }
 function updateUserUI(){
   const n = DB.settings?.name || '用户';
-  const isAnon = currentUser?.loginType === 'ANONYMOUS' || currentUser?.isAnonymous;
-  // 兼容 CloudBase 不同 SDK 版本
-  const e = currentUser?.email
-    || currentUser?.userInfo?.email
-    || (isAnon ? '访客模式' : '已登录');
+  const isAnon = MODE === 'local' || currentUser?.isAnonymous;
+  const e = (isAnon ? '本地模式（游客）' : (currentUser?.email || '已登录'));
   if (currentUser) currentUser.isAnonymous = isAnon;
   document.getElementById('userName').textContent = n;
   document.getElementById('userEmail').textContent = e;
@@ -6183,19 +6135,42 @@ async function doUpgradeAccount() {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return toast('邮箱格式不正确', 'error');
   if (p.length < 8) return toast('密码至少 8 位', 'error');
   try {
-    // v2: signUp；v1 兼容：signUpWithEmailAndPassword
-    if (typeof auth.signUp === 'function') {
-      await auth.signUp({ email: e, password: p });
-    } else if (typeof auth.signUpWithEmailAndPassword === 'function') {
-      await auth.signUpWithEmailAndPassword(e, p);
-    } else {
-      toast('当前 SDK 不支持账号升级，请退出后用邮箱重新注册', 'error');
-      return;
-    }
+    if (!pb) initPocketBase();
+    // 1. 注册并登录
+    await pb.collection('users').create({ email: e, password: p, passwordConfirm: p });
+    await pb.collection('users').authWithPassword(e, p);
+    currentUser = pb.authStore.model;
+
+    // 2. 把当前本地数据迁移到云端
     closeModal();
-    toast('✓ 账号已创建！请去邮箱验证，下次登录用新账号', 'success');
+    showLoading('正在把本地数据同步到云端...');
+    const localDB = DB;
+    for (const col of PB_COLLECTIONS){
+      for (const item of (localDB[col] || [])){
+        const payloadObj = {...item}; delete payloadObj.id;
+        try { await pb.collection(col).create({ owner: currentUser.id, payload: payloadObj }); }
+        catch(err){ console.warn('迁移失败', col, err); }
+      }
+    }
+    if (localDB.settings){
+      const payloadObj = { name: localDB.settings.name, graduation: localDB.settings.graduation, tracks: localDB.settings.tracks };
+      try { await pb.collection('settings').create({ owner: currentUser.id, payload: payloadObj }); } catch(err){}
+    }
+
+    // 3. 切到云端模式，清掉本地缓存，重新加载
+    MODE = 'cloud';
+    localStorage.setItem(MODE_KEY, 'cloud');
+    localStorage.removeItem(STORAGE_KEY);
+    await loadAllData();
+    hideLoading();
+    updateUserUI(); renderPage('dashboard');
+    toast('✓ 升级成功！数据已同步到云端', 'success');
   } catch (err) {
-    toast('绑定失败：' + (err.message || '请重试'), 'error');
+    hideLoading();
+    let msg = err?.message || '请重试';
+    const data = err?.data?.data;
+    if (data?.email) msg = '邮箱：' + data.email.message;
+    toast('升级失败：' + msg, 'error');
   }
 }
 async function saveSettings(){
@@ -6681,36 +6656,20 @@ async function confirmResumeUpload() {
   document.getElementById('resumeUploadProgress').style.display = 'block';
 
   try {
-    // 上传到 CloudBase Storage
-    const cloudPath = `resumes/${currentUser?.uid || 'anon'}/${uid()}_${_pendingResumeFile.name}`;
-    let fileUrl = '';
-    let fileId = '';
-
-    if (MODE === 'cloud' && app) {
-      const uploadRes = await app.uploadFile({
-        cloudPath,
-        filePath: _pendingResumeFile,
-        onUploadProgress: (p) => {
-          const pct = Math.round((p.loaded / p.total) * 100);
-          document.getElementById('resumeProgressFill').style.width = pct + '%';
-          document.getElementById('resumeProgressText').textContent = `正在上传 ${pct}%`;
-        }
-      });
-      fileId = uploadRes.fileID;
-      // 获取临时下载链接
-      try {
-        const urlRes = await app.getTempFileURL({ fileList: [fileId] });
-        fileUrl = urlRes.fileList[0]?.tempFileURL || '';
-      } catch (e) { console.warn('获取临时 URL 失败', e); }
-    } else {
-      // 兜底：转 base64 存数据库（仅用于演示，不推荐）
-      fileUrl = await readFileAsDataURL(_pendingResumeFile);
+    // 文件大小限制：base64 存 payload，PocketBase 单条 json 不宜过大
+    if (_pendingResumeFile.size > 5 * 1024 * 1024) {
+      throw new Error('文件超过 5MB，请压缩后再上传');
     }
+    document.getElementById('resumeProgressText').textContent = '正在读取文件...';
+    document.getElementById('resumeProgressFill').style.width = '40%';
+    // 转 base64 直接存入 payload（云端和本地统一）
+    const fileUrl = await readFileAsDataURL(_pendingResumeFile);
+    document.getElementById('resumeProgressFill').style.width = '90%';
 
     const record = {
-      _id: uid(), id: uid(),
+      id: uid(),
       ...meta,
-      fileId,
+      fileId: '',
       fileUrl,
       fileName: _pendingResumeFile.name,
       fileSize: _pendingResumeFile.size,
@@ -6718,8 +6677,7 @@ async function confirmResumeUpload() {
     };
 
     DB.resumes = DB.resumes || [];
-    DB.resumes.unshift(record);
-    await addItem('resumes', record);
+    await addItem('resumes', record);   // addItem 内部已 push 到 DB.resumes
 
     closeModal();
     toast(`✓ 已上传：${name}`, 'success');
@@ -6746,12 +6704,6 @@ async function deleteResume(id) {
   const r = (DB.resumes || []).find(x => x.id === id);
   if (!r) return;
   if (!confirm(`确定删除「${r.name}」？关联的投递记录里的引用也会失效。`)) return;
-  // 删除云存储文件
-  try {
-    if (r.fileId && MODE === 'cloud' && app && app.deleteFile) {
-      await app.deleteFile({ fileList: [r.fileId] });
-    }
-  } catch (e) { console.warn('删除云文件失败（继续删除记录）', e); }
   await deleteItem('resumes', id);
   toast('已删除', 'info');
   renderPage('resumes');
@@ -6764,14 +6716,7 @@ function editResumeMeta(id) {
 async function previewResume(id) {
   const r = (DB.resumes || []).find(x => x.id === id);
   if (!r || !r.fileUrl) return toast('简历文件不存在', 'error');
-  // 如果是 CloudBase 临时 URL，可能已过期，重新获取
-  let url = r.fileUrl;
-  if (r.fileId && MODE === 'cloud' && app) {
-    try {
-      const urlRes = await app.getTempFileURL({ fileList: [r.fileId] });
-      url = urlRes.fileList[0]?.tempFileURL || r.fileUrl;
-    } catch (e) {}
-  }
+  const url = r.fileUrl;   // base64 data URL，直接用
   const isPdf = /\.pdf$/i.test(r.fileName || '');
   const body = `
     <div class="resume-preview-modal">
@@ -7453,12 +7398,10 @@ function aiQuickSend(text) {
    公司库 · DeepSeek 爬虫触发
 ============================================================ */
 let _crawlerRunning = false;
+// 爬虫由 GitHub Actions 定时跑，产出 /data/opportunities.json 静态文件
+// 这里点「立即更新」= 拉取最新静态数据，合并进公司库（按 公司+岗位 去重）
 async function triggerOpportunityCrawler() {
   if (_crawlerRunning) { toast('正在更新中，稍候', 'info'); return; }
-  if (!app || !app.callFunction) {
-    toast('云端未初始化，无法触发更新', 'error');
-    return;
-  }
   _crawlerRunning = true;
   const btn = document.getElementById('oppCrawlerBtn');
   const label = document.getElementById('oppCrawlerBtnLabel');
@@ -7471,88 +7414,67 @@ async function triggerOpportunityCrawler() {
       <div class="opp-crawler-status running">
         <div class="opp-crawler-spinner"></div>
         <div class="opp-crawler-text">
-          <div class="opp-crawler-title">DEEPSEEK CRAWLING</div>
-          <div class="opp-crawler-sub">正在从 GitHub 招聘合集抓取 → DeepSeek 结构化 → 写入公司库</div>
+          <div class="opp-crawler-title">SYNCING</div>
+          <div class="opp-crawler-sub">正在拉取最新岗位数据（由定时爬虫产出）</div>
         </div>
       </div>`;
   }
 
-  let result;
+  let fetched = [];
   try {
-    const res = await app.callFunction({
-      name: 'opportunityCrawler',
-      data: { action: 'run', trigger: 'manual' },
-      timeout: 180000
-    });
-    result = res && res.result;
+    const res = await fetch('/data/opportunities.json?t=' + Date.now());
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    fetched = await res.json();
+    if (!Array.isArray(fetched)) throw new Error('数据格式错误');
   } catch (e) {
     if (panel) {
       panel.innerHTML = `<div class="opp-crawler-status error">
-        <div class="opp-crawler-title">CALL FAILED</div>
+        <div class="opp-crawler-title">SYNC FAILED</div>
         <div class="opp-crawler-sub">${escHtml(e.message || String(e))}</div>
       </div>`;
     }
-    toast('调用云函数失败：' + (e.message || ''), 'error');
+    toast('拉取数据失败：' + (e.message || ''), 'error');
     _crawlerRunning = false;
     if (btn) btn.disabled = false;
     if (label) label.textContent = '立即更新';
     return;
   }
 
+  // 去重合并：已有的 公司+岗位 跳过，新增的入库
+  const existing = new Set((DB.opportunities || []).map(o => `${o.company}|${o.position}`));
+  let inserted = 0;
+  for (const o of fetched) {
+    const key = `${o.company}|${o.position}`;
+    if (existing.has(key)) continue;
+    existing.add(key);
+    const opp = {
+      id: o.id || ('op_' + Math.random().toString(36).slice(2,10)),
+      company: o.company || '', position: o.position || '', city: o.city || '',
+      salary: o.salary || '', deadline: o.deadline || '', industry: o.industry || '',
+      tags: o.tags || [], requirements: o.requirements || [],
+      source: o.source || '爬虫', sourceUrl: o.sourceUrl || '',
+      desc: o.desc || '', createdAt: o.createdAt || new Date().toISOString(),
+    };
+    try { await addItem('opportunities', opp); inserted++; } catch(e){ console.warn(e); }
+  }
+
   _crawlerRunning = false;
   if (btn) btn.disabled = false;
   if (label) label.textContent = '立即更新';
 
-  if (!result) {
-    if (panel) panel.innerHTML = `<div class="opp-crawler-status error"><div class="opp-crawler-title">EMPTY RESULT</div></div>`;
-    toast('云函数无返回，请到控制台看日志', 'error');
-    return;
-  }
-
-  if (result.code === 'RATE_LIMITED') {
-    if (panel) panel.innerHTML = `<div class="opp-crawler-status warn">
-      <div class="opp-crawler-title">RATE LIMITED</div>
-      <div class="opp-crawler-sub">${escHtml(result.message || '')} · 已用 ${result.used}/${result.limit}</div>
-    </div>`;
-    toast(result.message || '已达到今日上限', 'info');
-    return;
-  }
-
-  if (!result.ok) {
-    if (panel) panel.innerHTML = `<div class="opp-crawler-status error">
-      <div class="opp-crawler-title">RUN FAILED</div>
-      <div class="opp-crawler-sub">${escHtml(result.error || '未知错误')}</div>
-    </div>`;
-    toast('更新失败：' + (result.error || ''), 'error');
-    return;
-  }
-
-  const p = result.phases || {};
-  const d = result.db || {};
   if (panel) {
     panel.innerHTML = `
       <div class="opp-crawler-status ok">
-        <div class="opp-crawler-title">UPDATE COMPLETE · ${Math.round((result.durationMs || 0) / 1000)}s</div>
+        <div class="opp-crawler-title">SYNC COMPLETE</div>
         <div class="opp-crawler-grid">
-          <div class="opp-crawler-cell"><div class="num">${p.fetched || 0}</div><div class="lab">FETCHED</div></div>
-          <div class="opp-crawler-cell accent"><div class="num">${d.inserted || 0}</div><div class="lab">NEW</div></div>
-          <div class="opp-crawler-cell"><div class="num">${d.updated || 0}</div><div class="lab">UPDATED</div></div>
-          <div class="opp-crawler-cell"><div class="num">${d.markedExpired || 0}</div><div class="lab">EXPIRED</div></div>
-          <div class="opp-crawler-cell"><div class="num">${p.llmCalls || 0}</div><div class="lab">LLM CALLS</div></div>
-          <div class="opp-crawler-cell"><div class="num">${(p.llmTokens || 0).toLocaleString()}</div><div class="lab">TOKENS</div></div>
+          <div class="opp-crawler-cell"><div class="num">${fetched.length}</div><div class="lab">FETCHED</div></div>
+          <div class="opp-crawler-cell accent"><div class="num">${inserted}</div><div class="lab">NEW</div></div>
+          <div class="opp-crawler-cell"><div class="num">${fetched.length - inserted}</div><div class="lab">SKIP</div></div>
         </div>
       </div>`;
   }
-  toast(`已更新：新增 ${d.inserted || 0} · 刷新 ${d.updated || 0}`, 'success');
-
-  // 重新加载 opportunities 数据再渲染
-  try {
-    const fresh = await db.collection('opportunities').where({ expired: false }).limit(200).get();
-    DB.opportunities = (fresh.data || []).map((r) => ({ ...r }));
-    renderPage('opportunities');
-  } catch (e) {
-    console.warn('[crawler] reload opportunities failed', e);
-  }
+  toast(`已更新：新增 ${inserted} 条岗位`, 'success');
+  renderPage('opportunities');
 }
 
 function openJDParser() {

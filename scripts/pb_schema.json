@@ -1,0 +1,338 @@
+[
+  {
+    "name": "applications",
+    "type": "base",
+    "schema": [
+      {
+        "name": "owner",
+        "type": "text",
+        "required": true,
+        "options": {}
+      },
+      {
+        "name": "payload",
+        "type": "json",
+        "required": false,
+        "options": {
+          "maxSize": 5242880
+        }
+      }
+    ],
+    "indexes": [
+      "CREATE INDEX idx_applications_owner ON applications (owner)"
+    ],
+    "listRule": "owner = @request.auth.id",
+    "viewRule": "owner = @request.auth.id",
+    "createRule": "owner = @request.auth.id",
+    "updateRule": "owner = @request.auth.id",
+    "deleteRule": "owner = @request.auth.id"
+  },
+  {
+    "name": "interviews",
+    "type": "base",
+    "schema": [
+      {
+        "name": "owner",
+        "type": "text",
+        "required": true,
+        "options": {}
+      },
+      {
+        "name": "payload",
+        "type": "json",
+        "required": false,
+        "options": {
+          "maxSize": 5242880
+        }
+      }
+    ],
+    "indexes": [
+      "CREATE INDEX idx_interviews_owner ON interviews (owner)"
+    ],
+    "listRule": "owner = @request.auth.id",
+    "viewRule": "owner = @request.auth.id",
+    "createRule": "owner = @request.auth.id",
+    "updateRule": "owner = @request.auth.id",
+    "deleteRule": "owner = @request.auth.id"
+  },
+  {
+    "name": "jobs",
+    "type": "base",
+    "schema": [
+      {
+        "name": "owner",
+        "type": "text",
+        "required": true,
+        "options": {}
+      },
+      {
+        "name": "payload",
+        "type": "json",
+        "required": false,
+        "options": {
+          "maxSize": 5242880
+        }
+      }
+    ],
+    "indexes": [
+      "CREATE INDEX idx_jobs_owner ON jobs (owner)"
+    ],
+    "listRule": "owner = @request.auth.id",
+    "viewRule": "owner = @request.auth.id",
+    "createRule": "owner = @request.auth.id",
+    "updateRule": "owner = @request.auth.id",
+    "deleteRule": "owner = @request.auth.id"
+  },
+  {
+    "name": "companies",
+    "type": "base",
+    "schema": [
+      {
+        "name": "owner",
+        "type": "text",
+        "required": true,
+        "options": {}
+      },
+      {
+        "name": "payload",
+        "type": "json",
+        "required": false,
+        "options": {
+          "maxSize": 5242880
+        }
+      }
+    ],
+    "indexes": [
+      "CREATE INDEX idx_companies_owner ON companies (owner)"
+    ],
+    "listRule": "owner = @request.auth.id",
+    "viewRule": "owner = @request.auth.id",
+    "createRule": "owner = @request.auth.id",
+    "updateRule": "owner = @request.auth.id",
+    "deleteRule": "owner = @request.auth.id"
+  },
+  {
+    "name": "resumes",
+    "type": "base",
+    "schema": [
+      {
+        "name": "owner",
+        "type": "text",
+        "required": true,
+        "options": {}
+      },
+      {
+        "name": "payload",
+        "type": "json",
+        "required": false,
+        "options": {
+          "maxSize": 5242880
+        }
+      }
+    ],
+    "indexes": [
+      "CREATE INDEX idx_resumes_owner ON resumes (owner)"
+    ],
+    "listRule": "owner = @request.auth.id",
+    "viewRule": "owner = @request.auth.id",
+    "createRule": "owner = @request.auth.id",
+    "updateRule": "owner = @request.auth.id",
+    "deleteRule": "owner = @request.auth.id"
+  },
+  {
+    "name": "skills",
+    "type": "base",
+    "schema": [
+      {
+        "name": "owner",
+        "type": "text",
+        "required": true,
+        "options": {}
+      },
+      {
+        "name": "payload",
+        "type": "json",
+        "required": false,
+        "options": {
+          "maxSize": 5242880
+        }
+      }
+    ],
+    "indexes": [
+      "CREATE INDEX idx_skills_owner ON skills (owner)"
+    ],
+    "listRule": "owner = @request.auth.id",
+    "viewRule": "owner = @request.auth.id",
+    "createRule": "owner = @request.auth.id",
+    "updateRule": "owner = @request.auth.id",
+    "deleteRule": "owner = @request.auth.id"
+  },
+  {
+    "name": "leetcode",
+    "type": "base",
+    "schema": [
+      {
+        "name": "owner",
+        "type": "text",
+        "required": true,
+        "options": {}
+      },
+      {
+        "name": "payload",
+        "type": "json",
+        "required": false,
+        "options": {
+          "maxSize": 5242880
+        }
+      }
+    ],
+    "indexes": [
+      "CREATE INDEX idx_leetcode_owner ON leetcode (owner)"
+    ],
+    "listRule": "owner = @request.auth.id",
+    "viewRule": "owner = @request.auth.id",
+    "createRule": "owner = @request.auth.id",
+    "updateRule": "owner = @request.auth.id",
+    "deleteRule": "owner = @request.auth.id"
+  },
+  {
+    "name": "journal",
+    "type": "base",
+    "schema": [
+      {
+        "name": "owner",
+        "type": "text",
+        "required": true,
+        "options": {}
+      },
+      {
+        "name": "payload",
+        "type": "json",
+        "required": false,
+        "options": {
+          "maxSize": 5242880
+        }
+      }
+    ],
+    "indexes": [
+      "CREATE INDEX idx_journal_owner ON journal (owner)"
+    ],
+    "listRule": "owner = @request.auth.id",
+    "viewRule": "owner = @request.auth.id",
+    "createRule": "owner = @request.auth.id",
+    "updateRule": "owner = @request.auth.id",
+    "deleteRule": "owner = @request.auth.id"
+  },
+  {
+    "name": "events",
+    "type": "base",
+    "schema": [
+      {
+        "name": "owner",
+        "type": "text",
+        "required": true,
+        "options": {}
+      },
+      {
+        "name": "payload",
+        "type": "json",
+        "required": false,
+        "options": {
+          "maxSize": 5242880
+        }
+      }
+    ],
+    "indexes": [
+      "CREATE INDEX idx_events_owner ON events (owner)"
+    ],
+    "listRule": "owner = @request.auth.id",
+    "viewRule": "owner = @request.auth.id",
+    "createRule": "owner = @request.auth.id",
+    "updateRule": "owner = @request.auth.id",
+    "deleteRule": "owner = @request.auth.id"
+  },
+  {
+    "name": "speeches",
+    "type": "base",
+    "schema": [
+      {
+        "name": "owner",
+        "type": "text",
+        "required": true,
+        "options": {}
+      },
+      {
+        "name": "payload",
+        "type": "json",
+        "required": false,
+        "options": {
+          "maxSize": 5242880
+        }
+      }
+    ],
+    "indexes": [
+      "CREATE INDEX idx_speeches_owner ON speeches (owner)"
+    ],
+    "listRule": "owner = @request.auth.id",
+    "viewRule": "owner = @request.auth.id",
+    "createRule": "owner = @request.auth.id",
+    "updateRule": "owner = @request.auth.id",
+    "deleteRule": "owner = @request.auth.id"
+  },
+  {
+    "name": "opportunities",
+    "type": "base",
+    "schema": [
+      {
+        "name": "owner",
+        "type": "text",
+        "required": true,
+        "options": {}
+      },
+      {
+        "name": "payload",
+        "type": "json",
+        "required": false,
+        "options": {
+          "maxSize": 5242880
+        }
+      }
+    ],
+    "indexes": [
+      "CREATE INDEX idx_opportunities_owner ON opportunities (owner)"
+    ],
+    "listRule": "owner = @request.auth.id",
+    "viewRule": "owner = @request.auth.id",
+    "createRule": "owner = @request.auth.id",
+    "updateRule": "owner = @request.auth.id",
+    "deleteRule": "owner = @request.auth.id"
+  },
+  {
+    "name": "settings",
+    "type": "base",
+    "schema": [
+      {
+        "name": "owner",
+        "type": "text",
+        "required": true,
+        "options": {}
+      },
+      {
+        "name": "payload",
+        "type": "json",
+        "required": false,
+        "options": {
+          "maxSize": 5242880
+        }
+      }
+    ],
+    "indexes": [
+      "CREATE INDEX idx_settings_owner ON settings (owner)"
+    ],
+    "listRule": "owner = @request.auth.id",
+    "viewRule": "owner = @request.auth.id",
+    "createRule": "owner = @request.auth.id",
+    "updateRule": "owner = @request.auth.id",
+    "deleteRule": "owner = @request.auth.id"
+  }
+]

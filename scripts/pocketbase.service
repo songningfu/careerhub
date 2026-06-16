@@ -1,0 +1,15 @@
+[Unit]
+Description=PocketBase for CareerHub
+After=network.target
+
+[Service]
+Type=simple
+User=root
+# 数据目录用 --dir 指定，PocketBase 数据落在 /opt/pocketbase/pb_data
+ExecStart=/opt/pocketbase/pocketbase serve --http=127.0.0.1:8090 --dir=/opt/pocketbase/pb_data
+Restart=always
+RestartSec=5
+LimitNOFILE=4096
+
+[Install]
+WantedBy=multi-user.target
